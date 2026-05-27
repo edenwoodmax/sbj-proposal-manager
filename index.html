@@ -66,7 +66,16 @@ header{background:var(--ink);color:var(--paper);padding:0 20px;display:flex;alig
 .lib-inp::placeholder{color:rgba(245,242,236,.25);}
 
 /* Shape list */
-.shape-item{display:flex;align-items:center;justify-content:space-between;padding:3px 6px;font-size:10px;color:rgba(245,242,236,.65);}
+.shape-item{display:flex;align-items:center;justify-content:space-between;padding:3px 6px;font-size:10px;color:rgba(245,242,236,.65);border-radius:3px;}
+.shape-item:hover{background:rgba(255,255,255,.06);}
+.shape-item-actions{display:flex;gap:3px;opacity:0;transition:opacity .12s;}
+.shape-item:hover .shape-item-actions{opacity:1;}
+.shape-act-btn{background:none;border:none;cursor:pointer;font-size:10px;padding:1px 5px;border-radius:2px;color:rgba(245,242,236,.45);font-family:'DM Sans',sans-serif;}
+.shape-act-btn:hover{background:rgba(255,255,255,.1);color:var(--paper);}
+.shape-act-btn.del:hover{background:rgba(200,80,42,.4);color:#fff;}
+.shape-edit-row{display:flex;gap:4px;padding:4px 6px;background:rgba(255,255,255,.05);border-radius:3px;margin-bottom:2px;}
+.shape-edit-inp{flex:1;padding:3px 6px;border-radius:3px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.08);color:var(--paper);font-size:10px;font-family:'DM Sans',sans-serif;outline:none;}
+.shape-edit-inp:focus{border-color:var(--al);}
 .shape-cap{font-family:'DM Mono',monospace;font-size:9px;color:rgba(245,242,236,.35);}
 .srch{width:100%;padding:5px 8px;border-radius:4px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.07);color:var(--paper);font-size:11px;font-family:'DM Sans',sans-serif;outline:none;margin-bottom:7px;}
 .srch:focus{border-color:var(--al);}
@@ -1247,7 +1256,46 @@ function renderShapeList(){
   const q=(document.getElementById('shape-srch')||{}).value||'';
   const hits=q?shapes.filter(s=>s.name.toLowerCase().includes(q.toLowerCase())):shapes;
   const el=document.getElementById('shape-list'); if(!el) return;
-  el.innerHTML=hits.map(s=>`<div class="shape-item"><span>${x(s.name)}</span><span class="shape-cap">${s.cap}</span></div>`).join('');
+  // find real index in shapes[] for each hit
+  el.innerHTML=hits.map(s=>{
+    const ri=shapes.indexOf(s);
+    return `<div class="shape-item" id="si-${ri}">
+      <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${x(s.name)}</span>
+      <span class="shape-cap" style="margin-right:4px;">${s.cap}</span>
+      <span class="shape-item-actions">
+        <button class="shape-act-btn" onclick="editShape(${ri})" title="Edit">✎</button>
+        <button class="shape-act-btn del" onclick="deleteShape(${ri})" title="Delete">✕</button>
+      </span>
+    </div>`;
+  }).join('');
+}
+function deleteShape(ri){
+  if(!confirm('Delete "'+shapes[ri].name+'"?')) return;
+  shapes.splice(ri,1);
+  renderShapeList(); toast('Shape deleted');
+}
+function editShape(ri){
+  const s=shapes[ri];
+  const el=document.getElementById('si-'+ri); if(!el) return;
+  el.outerHTML=`<div class="shape-edit-row" id="sei-${ri}">
+    <input class="shape-edit-inp" id="sen-${ri}" value="${x(s.name)}" placeholder="Name" style="width:90px;">
+    <input class="shape-edit-inp" id="sec-${ri}" value="${x(s.cap)}" placeholder="oz" style="width:44px;">
+    <button class="shape-act-btn" style="opacity:1;color:var(--al);" onclick="saveShapeEdit(${ri})">✓</button>
+    <button class="shape-act-btn del" style="opacity:1;" onclick="cancelShapeEdit(${ri})">✕</button>
+  </div>`;
+  document.getElementById('sen-'+ri).focus();
+}
+function saveShapeEdit(ri){
+  const nameEl=document.getElementById('sen-'+ri);
+  const capEl=document.getElementById('sec-'+ri);
+  if(!nameEl||!capEl) return;
+  const name=nameEl.value.trim(); if(!name){ toast('Enter a name'); return; }
+  shapes[ri]={name,cap:capEl.value.trim()||'-'};
+  shapes.sort((a,b)=>a.name.localeCompare(b.name));
+  renderShapeList(); toast('Shape updated');
+}
+function cancelShapeEdit(ri){
+  renderShapeList();
 }
 function addShape(){
   const name=(document.getElementById('new-shape-name').value||'').trim();
