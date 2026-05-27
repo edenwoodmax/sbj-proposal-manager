@@ -1,0 +1,1594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SBJ Proposal Manager</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500;600&display=swap');
+:root{
+  --ink:#1a1a18;--paper:#f5f2ec;--cream:#ede9df;--accent:#c8502a;--al:#e8957a;
+  --gold:#b89a4a;--steel:#4a5568;--muted:#8a8a80;--border:#d8d4cc;
+  --ok:#3a7d44;--card:#faf8f4;
+  --sh:0 2px 12px rgba(26,26,24,.08);--shl:0 8px 32px rgba(26,26,24,.14);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);min-height:100vh;font-size:14px;}
+
+/* HEADER */
+header{background:var(--ink);color:var(--paper);padding:0 20px;display:flex;align-items:center;justify-content:space-between;height:52px;position:sticky;top:0;z-index:200;}
+.logo{font-family:'DM Serif Display',serif;font-size:18px;letter-spacing:-.02em;}
+.logo span{color:var(--al);font-style:italic;}
+.ha{display:flex;gap:7px;align-items:center;}
+
+/* BTN */
+.btn{display:inline-flex;align-items:center;gap:5px;padding:6px 13px;border-radius:4px;border:none;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;white-space:nowrap;}
+.bp{background:var(--accent);color:#fff;}.bp:hover{background:#b0431f;}
+.bs{background:transparent;color:var(--paper);border:1px solid rgba(245,242,236,.3);}.bs:hover{background:rgba(245,242,236,.1);}
+.bo{background:transparent;color:var(--ink);border:1px solid var(--border);}.bo:hover{border-color:var(--ink);}
+.bg{background:transparent;color:var(--muted);border:none;padding:5px 8px;}.bg:hover{color:var(--ink);background:var(--cream);}
+.bd{background:transparent;color:#c0392b;border:1px solid #c0392b;}.bd:hover{background:#c0392b;color:#fff;}
+.bsm{padding:4px 9px;font-size:11px;}.bxs{padding:2px 7px;font-size:10px;}
+
+/* LAYOUT */
+.layout{display:flex;min-height:calc(100vh - 52px);}
+
+/* SIDEBAR */
+.sb{width:220px;flex-shrink:0;background:var(--ink);color:var(--paper);position:sticky;top:52px;height:calc(100vh - 52px);overflow-y:auto;display:flex;flex-direction:column;}
+.sb-tabs{display:flex;border-bottom:1px solid rgba(255,255,255,.1);flex-shrink:0;}
+.sb-tab{flex:1;padding:9px 3px;text-align:center;font-size:9px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;color:rgba(245,242,236,.4);transition:.15s;border-bottom:2px solid transparent;}
+.sb-tab.active{color:var(--al);border-bottom-color:var(--al);}
+.sb-panel{display:none;flex-direction:column;overflow-y:auto;padding:14px;flex:1;}
+.sb-panel.active{display:flex;}
+.sbl{font-family:'DM Mono',monospace;font-size:9px;font-weight:500;letter-spacing:.12em;color:rgba(245,242,236,.35);text-transform:uppercase;margin-bottom:6px;margin-top:10px;}
+.sbl:first-child{margin-top:0;}
+
+/* Sidebar Project Groups */
+.proj-group{margin-bottom:10px;}
+.proj-group-title{font-size:10px;font-weight:700;color:rgba(245,242,236,.5);padding:4px 6px;text-transform:uppercase;letter-spacing:.04em;}
+.nav-it{display:flex;align-items:center;gap:6px;padding:5px 10px;border-radius:3px;cursor:pointer;font-size:11px;color:rgba(245,242,236,.65);transition:.15s;margin-bottom:1px;}
+.nav-it:hover{background:rgba(245,242,236,.1);color:var(--paper);}
+
+/* Factory list */
+.fi-row{display:flex;align-items:center;padding:4px 6px;border-radius:3px;font-size:10px;color:rgba(245,242,236,.65);margin-bottom:1px;gap:5px;}
+.fcode{font-family:'DM Mono',monospace;font-size:9px;font-weight:600;background:rgba(255,255,255,.12);padding:1px 5px;border-radius:2px;color:var(--al);flex-shrink:0;}
+.fi-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10px;}
+
+/* Tech library sidebar */
+.lib-cat{margin-bottom:10px;}
+.lib-cat-title{font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:rgba(245,242,236,.4);margin-bottom:4px;}
+.lib-chips{display:flex;flex-wrap:wrap;gap:3px;}
+.lib-chip{font-size:9px;padding:2px 5px;border-radius:3px;background:rgba(255,255,255,.08);color:rgba(245,242,236,.7);display:flex;align-items:center;gap:3px;}
+.lib-chip .cx{cursor:pointer;color:rgba(245,242,236,.3);font-size:10px;}.lib-chip .cx:hover{color:var(--al);}
+.lib-add{display:flex;gap:3px;margin-top:4px;}
+.lib-inp{flex:1;padding:3px 6px;border-radius:3px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);color:var(--paper);font-size:10px;font-family:'DM Sans',sans-serif;outline:none;}
+.lib-inp:focus{border-color:var(--al);}
+.lib-inp::placeholder{color:rgba(245,242,236,.25);}
+
+/* Shape list */
+.shape-item{display:flex;align-items:center;justify-content:space-between;padding:3px 6px;font-size:10px;color:rgba(245,242,236,.65);}
+.shape-cap{font-family:'DM Mono',monospace;font-size:9px;color:rgba(245,242,236,.35);}
+.srch{width:100%;padding:5px 8px;border-radius:4px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.07);color:var(--paper);font-size:11px;font-family:'DM Sans',sans-serif;outline:none;margin-bottom:7px;}
+.srch:focus{border-color:var(--al);}
+.srch::placeholder{color:rgba(245,242,236,.25);}
+
+/* CONTENT */
+.content{flex:1;padding:24px 32px;max-width:1060px;overflow-x:hidden;}
+
+/* PROJECT CARD */
+.pc{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:20px;margin-bottom:20px;box-shadow:var(--sh);}
+.pc-head{display:flex;align-items:center;gap:9px;padding-bottom:14px;border-bottom:1px solid var(--border);margin-bottom:16px;}
+.pbadge{font-family:'DM Mono',monospace;font-size:9px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;padding:2px 7px;border-radius:3px;background:var(--cream);color:var(--steel);border:1px solid var(--border);}
+.pdn{font-family:'DM Serif Display',serif;font-size:16px;}
+
+/* FORM */
+.fg{display:grid;gap:11px;}
+.fg3{grid-template-columns:repeat(3,1fr);}
+.fg2{grid-template-columns:repeat(2,1fr);}
+.fg4{grid-template-columns:repeat(4,1fr);}
+.fgf{grid-column:1/-1;}
+.fgrp{display:flex;flex-direction:column;gap:3px;}
+.fl{font-size:10px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:#6a7280;}
+.fl .req{color:var(--accent);margin-left:2px;}
+.fi,.fsel,.fta{padding:7px 10px;border:1px solid var(--border);border-radius:5px;background:#fff;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--ink);transition:border-color .15s;outline:none;}
+.fi:focus,.fsel:focus,.fta:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(200,80,42,.07);}
+.fi.miss,.fsel.miss{border-color:var(--gold);background:#fefae8;}
+.fta{resize:vertical;min-height:56px;}
+.np-ta{min-height:60px;line-height:1.55;padding:8px 11px;font-size:13px;resize:vertical;}
+.fsel{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%238a8a80' d='M5 7L0 2h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 9px center;padding-right:24px;}
+
+/* SECTION HEADER */
+.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.st{font-family:'DM Serif Display',serif;font-size:19px;}
+.ss{font-size:11px;color:var(--muted);margin-top:1px;}
+
+/* DESIGN CARD */
+.dc{background:#fff;border:1px solid var(--border);border-radius:8px;overflow:hidden;box-shadow:0 1px 6px rgba(26,26,24,.05);margin-bottom:12px;}
+.dc-hd{display:flex;align-items:center;justify-content:space-between;padding:10px 15px;background:var(--cream);border-bottom:1px solid var(--border);cursor:pointer;user-select:none;}
+.dc-hd:hover{background:#e8e4d8;}
+.dc-hl{display:flex;align-items:center;gap:8px;}
+.dc-num{font-family:'DM Mono',monospace;font-size:10px;background:var(--ink);color:var(--paper);padding:2px 6px;border-radius:3px;}
+.dc-t{font-weight:600;font-size:13px;}
+.dc-s{font-size:11px;color:var(--muted);}
+.dc-acts{display:flex;gap:5px;align-items:center;}
+.chev{transition:transform .2s;font-size:13px;color:var(--muted);margin-left:4px;}
+.chev.open{transform:rotate(90deg);}
+.dc-bd{padding:16px;display:none;}
+.dc-bd.open{display:block;}
+
+/* SUBSECTION */
+.sub{margin-bottom:14px;}
+.sub-t{font-family:'DM Mono',monospace;font-size:9px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:#aaa;border-bottom:1px solid var(--border);padding-bottom:5px;margin-bottom:9px;}
+
+/* RADIO */
+.rrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:3px;}
+.rlabel{display:flex;align-items:center;gap:4px;cursor:pointer;font-size:13px;}
+.rlabel input{accent-color:var(--accent);}
+
+/* TECH SELECTOR */
+.tsel{border:1px solid var(--border);border-radius:6px;padding:9px;background:#fafaf8;}
+.tsel-chips{display:flex;flex-wrap:wrap;gap:5px;min-height:26px;}
+.sch{display:inline-flex;align-items:center;gap:4px;padding:4px 9px;border-radius:4px;background:var(--cream);border:1px solid var(--border);font-size:11px;cursor:pointer;transition:all .12s;user-select:none;}
+.sch:hover{border-color:var(--accent);color:var(--accent);}
+.sch.on{background:var(--ink);color:var(--paper);border-color:var(--ink);}
+.sch-del{font-size:10px;opacity:0;cursor:pointer;margin-left:3px;color:var(--muted);line-height:1;padding:0 1px;transition:opacity .1s;pointer-events:auto;}
+.sch:hover .sch-del{opacity:.5;}
+.sch:hover .sch-del:hover{opacity:1;color:#c0392b;}
+.sch.on .sch-del{color:rgba(245,242,236,.5);}
+.sch.on:hover .sch-del{opacity:.7;}
+.sch.on:hover .sch-del:hover{opacity:1;color:#e8957a;}
+.tadd{display:flex;gap:5px;margin-top:6px;align-items:center;}
+.tadd-inp{padding:4px 8px;border:1px dashed var(--border);border-radius:4px;background:transparent;font-size:11px;font-family:'DM Sans',sans-serif;color:var(--ink);outline:none;width:140px;}
+.tadd-inp:focus{border-color:var(--accent);}
+.tadd-inp::placeholder{color:var(--muted);}
+
+/* QUALITY CONCERN CHECKBOXES */
+.qc-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;}
+.qc-chip{display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:4px;background:var(--cream);border:1px solid var(--border);font-size:12px;cursor:pointer;transition:all .12s;user-select:none;}
+.qc-chip:hover{border-color:var(--accent);}
+.qc-chip.on{background:#fff3cd;border-color:var(--gold);color:#856404;font-weight:600;}
+.qc-chip .cx{cursor:pointer;color:rgba(0,0,0,.25);font-size:12px;margin-left:2px;}.qc-chip .cx:hover{color:#c0392b;}
+
+/* IMAGE PASTE ZONE */
+.imgz{border:2px dashed var(--border);border-radius:7px;min-height:120px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;position:relative;overflow:hidden;background:#fafaf8;outline:none;}
+.imgz:hover,.imgz.drag,.imgz:focus-visible{border-color:var(--accent);background:rgba(200,80,42,.03);}
+.imgz.has{border-style:solid;border-color:var(--border);}
+.iz-hint{text-align:center;color:var(--muted);pointer-events:none;}
+.iz-hint .ic{font-size:24px;display:block;margin-bottom:4px;}
+.iz-hint p{font-size:11px;font-weight:500;}
+.iz-hint small{font-size:10px;color:var(--border);}
+.iz-img{max-width:100%;max-height:220px;display:block;border-radius:4px;object-fit:contain;}
+.iz-acts{position:absolute;top:5px;right:5px;}
+.iz-upload-row{display:flex;gap:6px;margin-top:5px;align-items:center;}
+.iz-upload-btn{padding:4px 10px;border-radius:4px;border:1px solid var(--border);background:var(--cream);font-size:11px;font-family:'DM Sans',sans-serif;cursor:pointer;color:var(--steel);transition:all .12s;}
+.iz-upload-btn:hover{border-color:var(--accent);color:var(--accent);}
+
+/* TRACK RECORD */
+.tr-block{border:1px solid var(--border);border-radius:6px;padding:10px;background:#fafaf8;margin-top:4px;}
+.tr-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;}
+.tr-inp{padding:5px 8px;border:1px solid var(--border);border-radius:4px;background:#fff;font-size:12px;font-family:'DM Sans',sans-serif;color:var(--ink);outline:none;}
+.tr-inp:focus{border-color:var(--accent);}
+.tr-inp:disabled{background:var(--cream);color:var(--muted);}
+.tr-entries{display:flex;flex-direction:column;gap:6px;}
+.tr-entry{display:flex;align-items:center;gap:8px;padding:6px 8px;background:var(--cream);border-radius:5px;font-size:12px;}
+.tr-thumb{width:60px;height:60px;object-fit:contain;border-radius:3px;flex-shrink:0;background:#f5f2ec;cursor:zoom-in;}
+.tr-thumb-ph{width:36px;height:36px;border-radius:3px;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.tr-entry-info{flex:1;}
+.tr-entry-region{font-weight:600;font-size:11px;}
+.tr-entry-sku{font-size:10px;color:var(--muted);}
+
+/* ADD DESIGN BTN */
+.add-btn{border:2px dashed var(--border);border-radius:8px;padding:14px;text-align:center;cursor:pointer;color:var(--muted);font-size:13px;transition:all .15s;background:transparent;width:100%;font-family:'DM Sans',sans-serif;}
+.add-btn:hover{border-color:var(--accent);color:var(--accent);background:rgba(200,80,42,.03);}
+
+/* MODAL */
+.mo{position:fixed;inset:0;background:rgba(26,26,24,.6);z-index:1000;display:none;align-items:center;justify-content:center;backdrop-filter:blur(2px);}
+.mo.open{display:flex;}
+.md{background:var(--paper);border-radius:10px;padding:24px;max-width:960px;width:96%;max-height:92vh;overflow-y:auto;box-shadow:var(--shl);}
+.mdsm{max-width:480px;}
+.mh{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;}
+.mt{font-family:'DM Serif Display',serif;font-size:19px;}
+.mc{background:none;border:none;font-size:22px;cursor:pointer;color:var(--muted);line-height:1;padding:0 4px;}.mc:hover{color:var(--ink);}
+.mf{display:flex;justify-content:flex-end;gap:7px;margin-top:16px;padding-top:12px;border-top:1px solid var(--border);}
+
+/* ════════════════════════════════════════════════════
+   SBJ 2D HAZARD ANALYSIS — PRINT DOCUMENT STYLES
+   Target: A4 portrait, professional supplier proposal
+════════════════════════════════════════════════════ */
+
+/* Base */
+.D{font-family:'DM Sans',sans-serif;font-size:8.5pt;color:#111;line-height:1.45;background:#fff;}
+
+/* Header */
+.D-hdr{margin-bottom:0;padding-bottom:6pt;}
+.D-hdr-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4pt;}
+.D-org{font-size:6.5pt;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#555;margin-bottom:2pt;}
+.D-title{font-family:'DM Serif Display',serif;font-size:20pt;font-weight:400;color:#111;letter-spacing:-.02em;line-height:1;}
+.D-subtitle{font-size:10pt;font-weight:600;color:#333;margin-top:2pt;letter-spacing:-.01em;}
+.D-total-box{text-align:right;}
+.D-total-lbl{font-size:6pt;color:#999;text-transform:uppercase;letter-spacing:.07em;display:block;margin-bottom:1pt;}
+.D-total-val{font-size:20pt;font-family:'DM Serif Display',serif;color:#111;line-height:1;}
+.D-rule{border:none;border-top:1.5pt solid #111;margin:5pt 0 0;}
+.D-meta{display:grid;grid-template-columns:repeat(4,1fr);padding:5pt 0 5pt;border-bottom:0.5pt solid #ccc;}
+.D-meta-item .mk{font-size:5.5pt;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#aaa;display:block;margin-bottom:1pt;}
+.D-meta-item .mv{font-size:8.5pt;color:#111;}
+
+/* Design block */
+.D-block{break-inside:avoid;page-break-inside:avoid;margin-bottom:7pt;border:0.5pt solid #ccc;}
+
+/* Title bar — lighter, not full black */
+.D-bar{
+  display:flex;align-items:center;gap:7pt;
+  padding:4pt 8pt;
+  border-bottom:0.5pt solid #ccc;
+  background:#f5f5f5;
+}
+.D-bar-num{
+  font-family:'DM Mono',monospace;font-size:7.5pt;font-weight:600;
+  background:#111;color:#fff;
+  padding:1.5pt 5pt;border-radius:2pt;flex-shrink:0;
+}
+.D-bar-name{font-size:10.5pt;font-weight:600;letter-spacing:-.01em;flex:1;color:#111;}
+.D-badge-new{
+  font-size:6pt;font-weight:700;text-transform:uppercase;letter-spacing:.04em;
+  padding:1.5pt 6pt;border:0.5pt solid #333;border-radius:2pt;color:#333;
+}
+
+/* Body layout: image | middle | right */
+.D-body{display:grid;grid-template-columns:100pt 1fr 130pt;border-top:0pt;}
+
+/* Image column */
+.D-img-col{
+  border-right:0.5pt solid #e0e0e0;
+  padding:7pt;background:#fafafa;
+  display:flex;flex-direction:column;align-items:center;gap:4pt;
+}
+.D-ref-img{width:100%;max-height:80pt;object-fit:contain;display:block;}
+.D-img-ph{width:100%;height:60pt;display:flex;align-items:center;justify-content:center;font-size:6.5pt;color:#ccc;border:0.5pt dashed #ddd;}
+
+/* Middle column */
+.D-mid{border-right:0.5pt solid #e0e0e0;display:flex;flex-direction:column;}
+
+/* Right column */
+.D-right{display:flex;flex-direction:column;}
+
+/* Cell inside middle/right */
+.D-cell{padding:6pt 8pt;flex:1;}
+.D-cell+.D-cell{border-top:0.5pt solid #ebebeb;}
+.D-cell-t{
+  font-size:5.5pt;font-weight:700;text-transform:uppercase;letter-spacing:.09em;
+  color:#aaa;display:block;margin-bottom:4pt;padding-bottom:2pt;
+  border-bottom:0.5pt solid #ebebeb;
+}
+
+/* Inline field rows — "Label: Value" style */
+.D-inline{font-size:8pt;color:#111;margin-bottom:2.5pt;line-height:1.3;}
+.D-inline:last-child{margin-bottom:0;}
+.D-inline .lk{color:#999;font-size:7.5pt;margin-right:2pt;}
+
+/* Technology — compact list */
+.D-tech-section{margin-bottom:4pt;}
+.D-tech-section:last-child{margin-bottom:0;}
+.D-tech-cat{font-size:5.5pt;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#aaa;display:block;margin-bottom:1.5pt;}
+.D-tech-items{font-size:7.5pt;color:#222;line-height:1.5;padding-left:6pt;}
+.D-tech-items li{list-style:disc;margin-bottom:0;}
+
+/* Track record refs */
+.D-refs{display:flex;flex-wrap:wrap;gap:5pt;margin-top:4pt;}
+.D-ref{display:flex;flex-direction:column;gap:2pt;align-items:flex-start;}
+.D-ref img{width:46pt;height:36pt;object-fit:contain;border:0.5pt solid #e0e0e0;background:#f8f8f8;display:block;}
+.D-ref-ph{width:46pt;height:36pt;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:6pt;color:#bbb;border:0.5pt solid #e0e0e0;}
+.D-ref-info{font-size:6.5pt;color:#444;line-height:1.5;}
+.D-ref-info b{color:#111;display:block;}
+
+/* QC / New Point — clean paragraph */
+.D-qc-p{font-size:7.5pt;color:#222;line-height:1.6;margin:0;padding:0;}
+.D-qc-p li{list-style:disc;margin-left:8pt;margin-bottom:1pt;}
+
+/* Color row under image */
+.D-color-row{width:100%;border-top:0.5pt solid #e8e8e8;padding-top:4pt;}
+.D-color-row .lk{font-size:5.5pt;color:#aaa;font-weight:700;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:0.5pt;}
+.D-color-row .lv{font-size:7.5pt;color:#333;}
+
+/* Print */
+@media print{
+  body > *{display:none!important;}
+  #print-area{display:block!important;position:static!important;}
+  @page{size:A4 portrait;margin:13mm 13mm 15mm 13mm;}
+  .D{font-size:8pt;}
+  .D-block{break-inside:avoid;page-break-inside:avoid;}
+  .D-bar{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .D-bar-num{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+}
+#print-area{display:none;}
+
+
+/* MISC */
+.div{border:none;border-top:1px solid var(--border);margin:12px 0;}
+.es{text-align:center;padding:32px 14px;color:var(--muted);}
+.es .em{font-size:30px;display:block;margin-bottom:7px;}
+.toast{position:fixed;bottom:16px;right:16px;z-index:9999;background:var(--ink);color:var(--paper);padding:8px 16px;border-radius:5px;font-size:12px;box-shadow:var(--shl);transform:translateY(12px);opacity:0;transition:all .2s;pointer-events:none;}
+.toast.show{transform:translateY(0);opacity:1;}
+.flex{display:flex;}.aic{align-items:center;}.g6{gap:6px;}.g8{gap:8px;}
+.tm{color:var(--muted);}.tsm{font-size:12px;}.txs{font-size:10px;}.mono{font-family:'DM Mono',monospace;}
+.mt4{margin-top:4px;}.mt6{margin-top:6px;}.mt8{margin-top:8px;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">SBJ Proposal<span>Manager</span></div>
+  <div class="ha">
+    <button class="btn bs" onclick="openRisk()">🛡 Risk</button>
+    <button class="btn bp" onclick="openPDF()">📄 PDF Summary</button>
+  </div>
+</header>
+
+<div class="layout">
+
+<!-- ══ SIDEBAR ══ -->
+<aside class="sb">
+  <div class="sb-tabs">
+    <div class="sb-tab active" onclick="sbTab('promos')">Promotions</div>
+    <div class="sb-tab" onclick="sbTab('shapes')">Shapes</div>
+    <div class="sb-tab" onclick="sbTab('factories')">Factories</div>
+    <div class="sb-tab" onclick="sbTab('library')">Library</div>
+  </div>
+
+  <!-- Promotions: Save / Load / Delete -->
+  <div class="sb-panel active" id="sbp-promos">
+    <div class="sbl" style="margin-top:0;">Saved Promotions</div>
+    <div id="sb-promos-list"><div class="tm txs" style="padding:2px 0;">No saved promotions</div></div>
+    <div style="margin-top:10px;border-top:1px solid rgba(255,255,255,.07);padding-top:10px;">
+      <button class="btn bg" style="width:100%;justify-content:center;color:var(--al);margin-bottom:4px;" onclick="savePromotion()">💾 Save Current</button>
+      <div style="font-size:9px;color:rgba(245,242,236,.25);text-align:center;line-height:1.5;">Saves project info + all designs</div>
+    </div>
+  </div>
+
+  <!-- Shapes -->
+  <div class="sb-panel" id="sbp-shapes">
+    <div class="sbl" style="margin-top:0;">Cup / Product Shapes</div>
+    <input class="srch" id="shape-srch" placeholder="Search shape…" oninput="renderShapeList()">
+    <div id="shape-list" style="flex:1;overflow-y:auto;"></div>
+    <div style="margin-top:8px;border-top:1px solid rgba(255,255,255,.07);padding-top:8px;">
+      <div style="font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:rgba(245,242,236,.3);margin-bottom:5px;">Add Shape</div>
+      <div style="display:flex;flex-direction:column;gap:4px;">
+        <input class="lib-inp" id="new-shape-name" placeholder="Shape name">
+        <input class="lib-inp" id="new-shape-cap" placeholder="Capacity (oz / -)">
+        <button class="btn bp bsm" onclick="addShape()" style="width:100%;justify-content:center;">Add</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Factories -->
+  <div class="sb-panel" id="sbp-factories">
+    <div class="sbl" style="margin-top:0;">Factory List</div>
+    <div id="sb-factories"></div>
+    <button class="btn bg" style="width:100%;margin-top:8px;color:var(--al);justify-content:center;" onclick="openFMgr()">+ Manage</button>
+  </div>
+
+  <!-- Library -->
+  <div class="sb-panel" id="sbp-library">
+    <div class="sbl" style="margin-top:0;">Tech Library</div>
+    <div id="sb-library"></div>
+  </div>
+</aside>
+
+<!-- ══ CONTENT ══ -->
+<main class="content" id="app-content">
+
+  <!-- Project Info -->
+  <div class="pc">
+    <div class="pc-head">
+      <span class="pbadge">Project</span>
+      <span class="pdn" id="pdn"> — </span>
+    </div>
+    <div class="fg fg3">
+      <div class="fgrp"><label class="fl">Promotion / Project Name <span class="req">*</span></label><input class="fi" id="p-name" placeholder="e.g. Spring 2025 Launch" oninput="updProj()"></div>
+      <div class="fgrp"><label class="fl">Timing / Period <span class="req">*</span></label><input class="fi" id="p-timing" placeholder="e.g. Q2 2025 / Apr–Jun"></div>
+      <div class="fgrp"><label class="fl">GTM Stage</label>
+        <select class="fsel" id="p-gtm">
+          <option value="">— Select —</option>
+          <option>Concept</option>
+          <option>2D Proposal</option>
+          <option>DSS</option>
+        </select>
+      </div>
+      <div class="fgrp"><label class="fl">Submission Deadline</label><input class="fi" type="date" id="p-deadline"></div>
+      <div class="fgrp"><label class="fl">Prepared by</label><input class="fi" id="p-prepby" placeholder="e.g. Woodmax Eden"></div>
+      <div class="fgrp fgf"><label class="fl">General Notes</label><textarea class="fta" id="p-notes" style="min-height:44px;" placeholder="General notes…"></textarea></div>
+    </div>
+  </div>
+
+  <!-- Designs -->
+  <div class="sh">
+    <div><div class="st">Designs / SKUs</div><div class="ss" id="dcl">0 designs</div></div>
+    <button class="btn bp" onclick="addDesign()">+ Add Design</button>
+  </div>
+  <div id="design-list">
+    <div class="es" id="es"><span class="em">✏️</span><div style="font-weight:600;margin-bottom:3px;">No designs yet</div><div class="tsm">Click "+ Add Design" to start.</div></div>
+  </div>
+  <button class="add-btn" id="add-bottom" style="display:none;" onclick="addDesign()">+ Add Another Design</button>
+
+</main>
+</div>
+
+<!-- ══ PRINT AREA (hidden, injected before print) ══ -->
+<div id="print-area"></div>
+
+<!-- Factory Manager -->
+<div class="mo" id="mo-factory">
+  <div class="md mdsm">
+    <div class="mh"><div class="mt">Factory List</div><button class="mc" onclick="closeMo('mo-factory')">×</button></div>
+    <div id="factory-modal-list"></div>
+    <div style="margin-top:12px;border-top:1px solid var(--border);padding-top:12px;">
+      <div class="fl" style="margin-bottom:6px;">Add New Factory</div>
+      <div class="flex g6">
+        <input class="fi" id="nf-code" placeholder="Code" style="width:76px;flex-shrink:0;">
+        <input class="fi" id="nf-name" placeholder="Full factory name" style="flex:1;">
+        <button class="btn bp bsm" onclick="addFactory()">Add</button>
+      </div>
+    </div>
+    <div class="mf"><button class="btn bo" onclick="closeMo('mo-factory')">Done</button></div>
+  </div>
+</div>
+
+<!-- PDF Modal -->
+<div class="mo" id="mo-pdf">
+  <div class="md">
+    <div class="mh">
+      <div><div class="mt">PDF Summary Preview</div><div class="tm tsm mt4">Use Ctrl+P / Cmd+P → Save as PDF</div></div>
+      <button class="mc" onclick="closeMo('mo-pdf')">×</button>
+    </div>
+    <div id="pdf-preview-wrap"></div>
+    <div class="mf">
+      <button class="btn bo" onclick="closeMo('mo-pdf')">Close</button>
+      <button class="btn bp" onclick="doPrint()">🖨 Print / Save PDF</button>
+    </div>
+  </div>
+</div>
+
+<!-- Risk Modal -->
+<div class="mo" id="mo-risk">
+  <div class="md">
+    <div class="mh"><div class="mt">Internal Risk Checklist</div><button class="mc" onclick="closeMo('mo-risk')">×</button></div>
+    <div id="risk-out"></div>
+    <div class="mf"><button class="btn bo" onclick="closeMo('mo-risk')">Close</button></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ════════════════════════════════════════════
+// DATA
+// ════════════════════════════════════════════
+let designs = [];
+let dctr = 0;
+
+let factories = [
+  {code:'PH',name:'Dong Guan Kenxin Plastic & Metal Products Co.,Ltd.'},
+  {code:'NT',name:'New Tech Stainless Steel Products Co., LTD'},
+  {code:'HD',name:'ZHEJIANG HAODA SCIENCE AND TECHNOLOGY CO.,LTD'},
+  {code:'TY',name:'Taiyi Ceramic (Yixing) Co., Ltd'},
+  {code:'MSD',name:'HEBEI MSD GLASS TECHNOLOGY CO LTD'},
+  {code:'ZBD',name:'Huailai Zebado Glass Technology Co., Ltd.'},
+  {code:'SL',name:'NINGBO SYLOON STATIONERY CO.,LTD'},
+  {code:'GS',name:'Yongkang Guishang Household Products Co., Ltd.'},
+  {code:'A+',name:'APLUS MOLDS & PLASTICS CO.,LTD.'},
+  {code:'YL',name:'Shanghai Yulu Plastic Technology Co., Ltd.'},
+  {code:'HGY',name:'Hunan Liling Hongguanyao China Industry Co.,Ltd'},
+  {code:'LT',name:'Zhejiang Latim Electric Appliance Co.,Ltd'},
+  {code:'JQ',name:'Dongguan Jianqiao Clothing Accessories Co., Ltd'},
+  {code:'GTX',name:'NINGBO WORLD CROWN HOUSEWARE CO.,LTD.'},
+];
+
+const TECH_LIB = {
+  SS: {
+    'Painting': ['Glossy','Matte','Transparent','Gradient','Sand Texture','Diamond','Pearl','Crystal','Powder Coat','Ice Flower','Special','Cat Eye','Magnetic Cat Eye','Shell','Gold Onion','Chameleon','Metallic'],
+    'Decoration': ['Heat Transfer','Standard Decal','Special Decal','3D Print','Silk Screen','Laser Engraving','Wire Drawing','Sand Blasting','Tie-Dye','Customer-Supplied Part'],
+    'Logo': ['Embossed Logo','Laser WM Logo','Silk Screen Logo'],
+  },
+  PP: {
+    'Material Options': ['Tritan Straw','PP Straw','Double Wall','Single Wall'],
+    'Craft': ['Standard Insert','Special Insert','Spray Paint','Outer Silk Screen','Outer Heat Transfer'],
+  },
+  Ceramic: {
+    'Glaze': ['Glossy Glaze','Matte Glaze','No-Color Pearl','Rainbow Pearl','Metallic Glaze','Kiln Change'],
+    'Decoration': ['Standard Decal','Special Decal','Thermal Decal','Real Gold Paper','Faux Gold Paper','Gilding','Electroplating (Gold)','Laser Engraving','Relief','Copper Badge'],
+  },
+  Glass: {
+    'Material': ['Double Wall','Single Wall','High Borosilicate','Sodium Calcium','Colored Glass'],
+    'Craft': ['Spray Paint','Hand Spray','Sand Blasting','Decal','Thermal Decal','Chameleon','Copper Badge'],
+  },
+  Lifestyle: {
+    'Craft': ['Embroidery','Screen Print','Laser Engraving','Heat Transfer','Sublimation','Pad Print'],
+  },
+};
+
+// Default QC options (user can add more)
+let QC_OPTIONS = ['Under Verification','Sample Prep from WMX','Pending Approval','Supplier Issue','Material Risk','Process Risk'];
+
+const MAT_CATS = ['SS','PP','Ceramic','Glass','Lifestyle'];
+const REQUIRED = ['model-name','factory','material-cat'];
+
+let shapes = [
+  {name:'Adin',cap:'20'},{name:'Aigo',cap:'16'},{name:'Aira',cap:'16'},{name:'Alaska',cap:'16'},
+  {name:'Alistar',cap:'16'},{name:'Ambre16',cap:'16'},{name:'Ambre24',cap:'24'},{name:'Ariel',cap:'24'},
+  {name:'Aries',cap:'19'},{name:'Arlo',cap:'12'},{name:'Arthur',cap:'21'},{name:'Aura',cap:'25'},
+  {name:'Balder',cap:'20'},{name:'Beckie',cap:'18'},{name:'Bourbon',cap:'20'},{name:'Bronny',cap:'15.5'},
+  {name:'Bubble',cap:'Depends'},{name:'Buff',cap:'15'},{name:'Buzz14.5',cap:'14.5'},{name:'Buzz20',cap:'20'},
+  {name:'Canister',cap:'-'},{name:'Carbon',cap:'18'},{name:'Carrie',cap:'20'},{name:'Cathy12',cap:'12'},
+  {name:'Cathy16',cap:'16'},{name:'CeramicHGY',cap:'-'},{name:'CeramicTY',cap:'-'},{name:'Chap',cap:'10'},
+  {name:'Charlize',cap:'14'},{name:'Cheers',cap:'19'},{name:'Chuck',cap:'40'},{name:'Clover6.8',cap:'6.8'},
+  {name:'Clover9.5',cap:'9.5'},{name:'Coaster',cap:'-'},{name:'Cobbie',cap:'16'},{name:'Coffee Press',cap:'1L'},
+  {name:'Columbia',cap:'16'},{name:'Crystal12',cap:'12'},{name:'Crystal18',cap:'18'},{name:'Daala',cap:'16'},
+  {name:'Daily',cap:'16'},{name:'Daisy',cap:'15'},{name:'Debbie14',cap:'14'},{name:'Debbie16',cap:'16'},
+  {name:'Deborah',cap:'12'},{name:'Denali',cap:'16'},{name:'Diamond12',cap:'12'},{name:'Diamond16',cap:'16'},
+  {name:'Dion',cap:'20'},{name:'Dodge',cap:'16'},{name:'Dom',cap:'22'},{name:'Dome Lid',cap:'16'},
+  {name:'Domino',cap:'16'},{name:'Dota',cap:'22'},{name:'Dua',cap:'21'},{name:'Duffy',cap:'24'},
+  {name:'Emma',cap:'20'},{name:'Endor12.9',cap:'12.9'},{name:'Endor6.8',cap:'6.8'},{name:'Enya',cap:'15'},
+  {name:'Faceted',cap:'14'},{name:'Fancy',cap:'12'},{name:'Finn(S)',cap:'15.5'},{name:'Finn17.7',cap:'17.7'},
+  {name:'Finn23',cap:'23'},{name:'Fiona12',cap:'12'},{name:'Fiona20',cap:'20'},{name:'Flair',cap:'24'},
+  {name:'Flo',cap:'16'},{name:'Flora',cap:'24'},{name:'Forge',cap:'16.5'},{name:'Gaia',cap:'38'},
+  {name:'Geisha',cap:'12'},{name:'GlassMSD',cap:'-'},{name:'GlassZBD',cap:'-'},{name:'Globe',cap:'8'},
+  {name:'Hadley18',cap:'18'},{name:'Hadley8.5',cap:'8.5'},{name:'Hammered Phinney',cap:'12'},{name:'Hank',cap:'18'},
+  {name:'Hobby12',cap:'12'},{name:'Hobby16',cap:'16'},{name:'Hobby20',cap:'20'},{name:'Holi12',cap:'12'},
+  {name:'Holi16',cap:'16'},{name:'Hugo',cap:'20'},{name:'Itsy11',cap:'11'},{name:'Itsy8.8',cap:'8.8'},
+  {name:'Jello(P)',cap:'16'},{name:'Jello(S)',cap:'16'},{name:'Jibby Lid',cap:'16'},{name:'Jugger',cap:'34'},
+  {name:'Jumbo',cap:'86'},{name:'Jungle',cap:'16'},{name:'Juri',cap:'17'},{name:'Katie',cap:'14'},
+  {name:'Kay',cap:'16.5'},{name:'Keith12',cap:'12'},{name:'Keith16',cap:'16'},{name:'Kessel',cap:'12'},
+  {name:'Kettle (ABS)',cap:'550ml'},{name:'Kettle(Bakelite)',cap:'1L'},{name:'Kettle(S)',cap:'550ml'},
+  {name:'Kona(P)',cap:'16'},{name:'Kona12',cap:'12'},{name:'Kona8',cap:'8'},{name:'Laven',cap:'8'},
+  {name:'Lavine (PLA)',cap:'11.5'},{name:'Leo',cap:'16'},{name:'Linton',cap:'12'},{name:'Lira(P)',cap:'15'},
+  {name:'Lira(S)',cap:'12'},{name:'Lisa',cap:'14'},{name:'Lora12',cap:'12'},{name:'Lora16',cap:'16'},
+  {name:'Lucid',cap:'21.5'},{name:'Luffy',cap:'24'},{name:'Luna16',cap:'16'},{name:'Magic12',cap:'12'},
+  {name:'Magic16',cap:'16'},{name:'Mason',cap:'16'},{name:'Maximus',cap:'16'},{name:'Merry12',cap:'12'},
+  {name:'Merry8',cap:'8'},{name:'Meteor',cap:'20'},{name:'Miami',cap:'16'},{name:'Mini Tank',cap:'4.5'},
+  {name:'Mini6.5',cap:'6.5'},{name:'Mini9.5',cap:'9.5'},{name:'Mixy17.5',cap:'17.5'},{name:'Mixy24',cap:'24'},
+  {name:'Mocha12',cap:'12'},{name:'Mocha15',cap:'15'},{name:'Molie',cap:'11'},{name:'Nick',cap:'12.5'},
+  {name:'Nigara',cap:'16'},{name:'Nikki',cap:'12.5'},{name:'Noa',cap:'28'},{name:'Obi12',cap:'12'},
+  {name:'Obi16',cap:'16'},{name:'Odan11.5',cap:'11.5'},{name:'Odan16.5',cap:'16.5'},{name:'Olaf',cap:'9'},
+  {name:'Opera',cap:'16'},{name:'Otoh',cap:'16'},{name:'Owen',cap:'20'},{name:'Pacci',cap:'21.5'},
+  {name:'Perla',cap:'16'},{name:'Phil',cap:'7.5'},{name:'Phinney12',cap:'12'},{name:'Phinney16',cap:'16'},
+  {name:'Phinney20',cap:'20'},{name:'Pike',cap:'16'},{name:'Pixy13',cap:'13'},{name:'Pixy8.5',cap:'8.5'},
+  {name:'Pladd',cap:'12'},{name:'Plaid',cap:'16'},{name:'Potter',cap:'16'},{name:'Puck',cap:'10'},
+  {name:'Rally',cap:'18'},{name:'Rayne',cap:'10.5'},{name:'Rockie12',cap:'12'},{name:'Rockie16',cap:'16'},
+  {name:'Rudy',cap:'24'},{name:'Runa',cap:'24'},{name:'Scale12',cap:'12'},{name:'Scale16',cap:'16'},
+  {name:'Scale20',cap:'20'},{name:'Shae12',cap:'16'},{name:'Shae16',cap:'12'},{name:'Sipez',cap:'16'},
+  {name:'Slurpee',cap:'16/24'},{name:'Sporty',cap:'18'},{name:'Star',cap:'16'},{name:'Sundae',cap:'24'},
+  {name:'Swirl',cap:'16'},{name:'Taka(P)',cap:'41'},{name:'Taka(S) 24',cap:'24'},{name:'Taka(S) 32',cap:'32'},
+  {name:'Taka(S)41',cap:'41'},{name:'Taka18',cap:'18'},{name:'Taka24',cap:'24'},{name:'Taka32',cap:'32'},
+  {name:'Tank',cap:'17'},{name:'Theo',cap:'14.5'},{name:'Thor',cap:'18'},{name:'Tiki14',cap:'14'},
+  {name:'Tiki18',cap:'18'},{name:'Tiki32',cap:'32'},{name:'Tiki41',cap:'41'},{name:'Tiki64',cap:'64'},
+  {name:'Tiny Tank',cap:'70ml'},{name:'Tkachuk',cap:'17'},{name:'Tucker12',cap:'12'},{name:'Tucker16',cap:'16'},
+  {name:'Twist12',cap:'12'},{name:'Twist16',cap:'16'},{name:'Tyr',cap:'8'},{name:'Una12',cap:'12'},
+  {name:'Una16',cap:'16'},{name:'Value12',cap:'12'},{name:'Value16',cap:'16'},{name:'Value20',cap:'20'},
+  {name:'Venus12',cap:'12'},{name:'Venus16',cap:'16'},{name:'Victor',cap:'16'},{name:'Victoria',cap:'16'},
+  {name:'Vie',cap:'14'},{name:'Villa12',cap:'12'},{name:'Villa16',cap:'16'},{name:'Voko',cap:'12'},
+  {name:'Walker16',cap:'16'},{name:'Walker23',cap:'23'},{name:'Wayne',cap:'26'},{name:'Wendy',cap:'21'},
+  {name:'Willy',cap:'12'},{name:'Wilson12',cap:'12'},{name:'Wilson16',cap:'16'},{name:'Woody',cap:'20'},
+  {name:'Xavi',cap:'16'},{name:'Yam',cap:'15'},{name:'Yavin',cap:'16'},{name:'Zippie',cap:'18'},
+  {name:'Zoey',cap:'19.5'},{name:'Zoey(P)',cap:'26.5'},
+];
+
+// ════════════════════════════════════════════
+// DESIGN FACTORY
+// ════════════════════════════════════════════
+function makeDesign(ov={}) {
+  dctr++;
+  return {
+    id: 'D'+Date.now()+Math.random().toString(36).slice(2,5),
+    expanded: true,
+    'model-name': ov['model-name']||'',
+    'factory': ov['factory']||'',
+    'material-cat': ov['material-cat']||'',
+    'material': ov['material']||'',
+    'new-model': ov['new-model']||'No',
+    'track-yes': ov['track-yes']||false,
+    'track-entries': ov['track-entries']?ov['track-entries'].map(x=>({...x})):[],
+    'tech-sel': ov['tech-sel']?JSON.parse(JSON.stringify(ov['tech-sel'])):{},
+    'new-point': ov['new-point']||'',
+    'qc-flags': ov['qc-flags']?[...ov['qc-flags']]:[],
+    'qc-notes': ov['qc-notes']||'',
+    'color-variation': ov['color-variation']||'',
+    'pantone': ov['pantone']||'',
+    'image': ov['image']||null,
+    '_idx': dctr,
+  };
+}
+
+function addDesign(){
+  const d=makeDesign(); designs.push(d);
+  rerender(); toast('Design added');
+  setTimeout(()=>{ const el=document.getElementById('dc-'+d.id); if(el) el.scrollIntoView({behavior:'smooth',block:'start'}); },80);
+}
+function dupDesign(id){
+  const s=designs.find(d=>d.id===id); if(!s) return;
+  const c=makeDesign({...s});
+  const i=designs.findIndex(d=>d.id===id); designs.splice(i+1,0,c);
+  rerender(); toast('Duplicated');
+}
+function delDesign(id){
+  if(!confirm('Delete this design?')) return;
+  designs=designs.filter(d=>d.id!==id); rerender(); toast('Deleted');
+}
+
+// ════════════════════════════════════════════
+// RENDER
+// ════════════════════════════════════════════
+function rerender(){
+  renderDesigns(); renderSbDesigns(); renderSbFactories(); renderSbLibrary(); renderShapeList();
+}
+
+function renderDesigns(){
+  const c=document.getElementById('design-list');
+  const ab=document.getElementById('add-bottom');
+  if(!designs.length){
+    c.innerHTML=''; c.appendChild(mkES());
+    if(ab) ab.style.display='none';
+    document.getElementById('dcl').textContent='0 designs';
+    return;
+  }
+  document.getElementById('dcl').textContent=`${designs.length} design${designs.length>1?'s':''}`;
+  if(ab) ab.style.display='block';
+  c.innerHTML=designs.map((d,i)=>buildDC(d,i)).join('');
+  designs.forEach(d=>{ attachEv(d); setupImgZone(d); });
+}
+
+function buildDC(d,idx){
+  const cat=d['material-cat']||'';
+  const factObj=factories.find(f=>f.code===d.factory);
+  const factDisp=factObj?`${factObj.code} — ${factObj.name.split(' ').slice(0,3).join(' ')}…`:(d.factory||'');
+  const exp=d.expanded!==false;
+  const fOpts=factories.map(f=>`<option value="${x(f.code)}" ${d.factory===f.code?'selected':''}>${x(f.code)} — ${x(f.name)}</option>`).join('');
+
+  // Tech sections
+  let techHTML='';
+  if(cat&&TECH_LIB[cat]){
+    Object.entries(TECH_LIB[cat]).forEach(([cn,items])=>{
+      const cnKey=cn.replace(/ /g,'_');
+      const chips=items.map(t=>{
+        const sel=((d['tech-sel']||{})[cn]||[]).includes(t);
+        const sp=document.createElement('span');
+        sp.className='sch'+(sel?' on':'');
+        sp.dataset.did=d.id; sp.dataset.cat=cn; sp.dataset.tech=t;
+        const lbl=document.createElement('span'); lbl.textContent=t;
+        sp.appendChild(lbl);
+        const dx=document.createElement('span');
+        dx.className='sch-del'; dx.textContent='×';
+        dx.dataset.action='deltech'; dx.dataset.matcat=cat; dx.dataset.cat=cn; dx.dataset.tech=t;
+        sp.appendChild(dx);
+        return sp.outerHTML;
+      }).join('');
+      const rowId='tc-'+d.id+'-'+cnKey;
+      const inpId='ta-'+d.id+'-'+cnKey;
+      const btnHtml='<button class="btn bo bsm" data-action="addtech" data-did="'+d.id+'" data-cat="'+cn+'" data-inp="'+inpId+'">+ Add</button>';
+      techHTML+=`<div class="sub"><div class="sub-t">${x(cn)}</div><div class="tsel"><div class="tsel-chips" id="${rowId}">${chips}</div><div class="tadd"><input class="tadd-inp" id="${inpId}" placeholder="Add new…" data-action="addtech-enter" data-did="${d.id}" data-cat="${cn}">${btnHtml}</div></div></div>`;
+    });
+  } else if(!cat){
+    techHTML=`<div class="sub"><div class="sub-t">Technology</div><div style="font-size:12px;color:var(--muted);padding:8px;border:1px dashed var(--border);border-radius:5px;">Select a material category to see relevant technology options.</div></div>`;
+  }
+
+  // QC chips
+  const qcChips=QC_OPTIONS.map(opt=>{
+    const on=(d['qc-flags']||[]).includes(opt);
+    return `<span class="qc-chip ${on?'on':''}" onclick="toggleQC('${d.id}','${x(opt)}')">${x(opt)}<span class="cx" onclick="delQCOption('${x(opt)}');event.stopPropagation();">×</span></span>`;
+  }).join('');
+
+  // Track record entries
+  const trEntries=(d['track-entries']||[]).map((te,ti)=>`
+    <div class="tr-entry" id="tre-${d.id}-${ti}">
+      ${te.img?`<img class="tr-thumb" data-lb="1" style="cursor:zoom-in;" src="${te.img}">`:`<div class="tr-thumb-ph">🌍</div>`}
+      <div class="tr-entry-info">
+        <div class="tr-entry-region">${x(te.region||'—')}</div>
+        <div class="tr-entry-sku">${te.sku?'SKU: '+x(te.sku):''}</div>
+      </div>
+      <button class="btn bd bxs" onclick="delTrackEntry('${d.id}',${ti})">✕</button>
+    </div>`).join('');
+
+  return `
+<div class="dc" id="dc-${d.id}">
+  <div class="dc-hd" onclick="toggleDC('${d.id}')">
+    <div class="dc-hl">
+      <span class="dc-num">#${idx+1}</span>
+      <div>
+        <div class="dc-t" id="dct-${d.id}">${d['model-name']?x(d['model-name']):'<span style="color:var(--muted);font-style:italic;">No Model Name</span>'}</div>
+        <div class="dc-s">${cat?x(cat)+' · ':''}<span id="dcs-${d.id}">${x(factDisp)||'No factory'}</span></div>
+      </div>
+    </div>
+    <div class="flex aic g6">
+      <div class="dc-acts" onclick="event.stopPropagation()">
+        <button class="btn bo bsm" onclick="dupDesign('${d.id}')">⎘</button>
+        <button class="btn bd bsm" onclick="delDesign('${d.id}')">✕</button>
+      </div>
+      <span class="chev ${exp?'open':''}">›</span>
+    </div>
+  </div>
+  <div class="dc-bd ${exp?'open':''}" id="dcbd-${d.id}">
+
+    <!-- Image + Identity -->
+    <div style="display:grid;grid-template-columns:160px 1fr;gap:14px;margin-bottom:14px;">
+      <div>
+        <div class="fl" style="margin-bottom:5px;">Reference Image</div>
+        <div class="imgz ${d.image?'has':''}" id="iz-${d.id}" tabindex="0">
+          ${d.image
+            ?`<img class="iz-img" src="${d.image}"><div class="iz-acts"><button class="btn bd bxs" onclick="clearImg('${d.id}');event.stopPropagation();">✕</button></div>`
+            :`<div class="iz-hint"><span class="ic">🖼</span><p>Click or Paste</p><small>Ctrl+V · Drag &amp; Drop</small></div>`}
+        </div>
+        <div class="iz-upload-row">
+          <input type="file" accept="image/*" id="ifu-${d.id}" style="display:none;" onchange="handleImgUpload(this,'${d.id}')">
+          <button class="iz-upload-btn" onclick="document.getElementById('ifu-${d.id}').click()">📁 Upload</button>
+          <span style="font-size:10px;color:var(--muted);">or paste / drop</span>
+        </div>
+      </div>
+      <div class="fg fg2" style="align-content:start;gap:10px;">
+        <div class="fgrp fgf">
+          <label class="fl">Model Name <span class="req">*</span></label>
+          <div style="position:relative;">
+            <input class="fi ${!d['model-name']?'miss':''}" id="f-${d.id}-model-name" value="${x(d['model-name'])}" placeholder="Type or select shape…" autocomplete="off" oninput="onModelInput(this,'${d.id}')">
+            <div id="ac-${d.id}" style="position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid var(--border);border-top:none;border-radius:0 0 5px 5px;max-height:180px;overflow-y:auto;z-index:50;display:none;box-shadow:var(--sh);"></div>
+          </div>
+        </div>
+        <div class="fgrp">
+          <label class="fl">Factory <span class="req">*</span></label>
+          <select class="fsel ${!d.factory?'miss':''}" id="f-${d.id}-factory">
+            <option value="">— Select Factory —</option>${fOpts}
+          </select>
+        </div>
+        <div class="fgrp">
+          <label class="fl">Material Category <span class="req">*</span></label>
+          <select class="fsel ${!d['material-cat']?'miss':''}" id="f-${d.id}-material-cat" onchange="onMatCat('${d.id}',this.value)">
+            <option value="">— Select —</option>
+            ${MAT_CATS.map(m=>`<option value="${m}" ${d['material-cat']===m?'selected':''}>${m}</option>`).join('')}
+          </select>
+        </div>
+        <div class="fgrp">
+          <label class="fl">Material Detail</label>
+          <input class="fi" id="f-${d.id}-material" value="${x(d['material'])}" placeholder="e.g. SS304, Borosilicate…">
+        </div>
+      </div>
+    </div>
+
+    <!-- Status -->
+    <div class="sub">
+      <div class="sub-t">Product Status</div>
+      <div class="fg fg2" style="gap:10px;">
+        <div class="fgrp">
+          <label class="fl">New Model</label>
+          <div class="rrow">
+            <label class="rlabel"><input type="radio" name="nm-${d.id}" value="Yes" ${d['new-model']==='Yes'?'checked':''} onchange="setF('${d.id}','new-model','Yes')"> Yes</label>
+            <label class="rlabel"><input type="radio" name="nm-${d.id}" value="No" ${d['new-model']!=='Yes'?'checked':''} onchange="setF('${d.id}','new-model','No')"> No</label>
+          </div>
+        </div>
+        <div class="fgrp">
+          <label class="fl">Track Record in Other Regions</label>
+          <div class="rrow">
+            <label class="rlabel"><input type="radio" name="tr-${d.id}" value="y" ${d['track-yes']?'checked':''} onchange="setTrack('${d.id}',true)"> Yes</label>
+            <label class="rlabel"><input type="radio" name="tr-${d.id}" value="n" ${!d['track-yes']?'checked':''} onchange="setTrack('${d.id}',false)"> No</label>
+          </div>
+        </div>
+      </div>
+      <!-- Track entries (shown when Yes) -->
+      <div id="tr-block-${d.id}" style="${d['track-yes']?'':'display:none;'}margin-top:10px;">
+        <div class="tr-block">
+          <div class="tr-entries" id="tr-entries-${d.id}">${trEntries}</div>
+          <!-- Add track entry form -->
+          <div style="margin-top:${(d['track-entries']||[]).length?'8px':'0'};border-top:${(d['track-entries']||[]).length?'1px solid var(--border)':'none'};padding-top:${(d['track-entries']||[]).length?'8px':'0'};">
+            <div class="fl" style="margin-bottom:5px;">Add Region Reference</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;">
+              <div class="fgrp"><label class="fl">Region</label><input class="fi" id="tr-reg-${d.id}" placeholder="e.g. Japan" style="width:120px;"></div>
+              <div class="fgrp"><label class="fl">SKU #</label><input class="fi" id="tr-sku-${d.id}" placeholder="e.g. JPN-001" style="width:120px;"></div>
+              <div class="fgrp">
+                <label class="fl">Image (optional)</label>
+                <div class="imgz" id="triz-${d.id}" tabindex="0" style="min-height:44px;width:100px;">
+                  <div class="iz-hint"><span style="font-size:14px;">🖼</span><small style="font-size:9px;">Ctrl+V / drop</small></div>
+                </div>
+                <input type="file" accept="image/*" id="trifu-${d.id}" style="display:none;" onchange="handleTrImgUpload(this,'${d.id}')">
+                <button class="iz-upload-btn" style="margin-top:4px;width:100px;" onclick="document.getElementById('trifu-${d.id}').click()">📁 Upload</button>
+              </div>
+              <button class="btn bp bsm" onclick="addTrackEntry('${d.id}')" style="align-self:flex-end;">+ Add</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tech -->
+    ${techHTML}
+
+
+
+    <!-- New Point -->
+    <div class="sub">
+      <div class="sub-t">New Point / Innovation</div>
+      <div class="fgrp"><textarea class="fta" id="f-${d.id}-new-point" style="min-height:48px;width:100%;" placeholder="e.g. coating combinations, material specs, printing method, functionality differences, risk considerations…">${x(d['new-point'])}</textarea></div>
+    </div>
+
+    <!-- Quality Concern (multi-select chips) -->
+    <div class="sub">
+      <div class="sub-t">Quality Concern</div>
+      <div class="qc-chips" id="qcc-${d.id}">${qcChips}</div>
+      <!-- Add new QC option -->
+      <div class="tadd mt6">
+        <input class="tadd-inp" id="qca-${d.id}" placeholder="Add new concern type…" onkeydown="if(event.key==='Enter'){addQCOption('${d.id}',this.value);this.value='';}">
+        <button class="btn bo bsm" onclick="addQCOption('${d.id}',document.getElementById('qca-${d.id}').value);document.getElementById('qca-${d.id}').value='';">+ Add</button>
+      </div>
+      <div class="fgrp mt6"><label class="fl">Concern Notes</label><textarea class="fta" id="f-${d.id}-qc-notes" style="min-height:48px;" placeholder="Describe the concern in detail…">${x(d['qc-notes'])}</textarea></div>
+    </div>
+
+  </div>
+</div>`;
+}
+
+// ════════════════════════════════════════════
+// EVENTS / SETTERS
+// ════════════════════════════════════════════
+function attachEv(d){
+  ['model-name','material','new-point','qc-notes'].forEach(k=>{
+    const el=document.getElementById(`f-${d.id}-${k}`); if(!el) return;
+    const sync=()=>{ d[k]=el.value; updHeader(d.id); renderSbDesigns(); };
+    el.addEventListener('input', sync);
+    el.addEventListener('change', sync);
+    el.addEventListener('blur', sync);
+  });
+  const fa=document.getElementById(`f-${d.id}-factory`);
+  if(fa) fa.addEventListener('change',()=>{ d.factory=fa.value; updHeader(d.id); renderSbDesigns(); });
+  const mc=document.getElementById(`f-${d.id}-material-cat`);
+  if(mc) mc.addEventListener('change',()=>{ d['material-cat']=mc.value; });
+}
+
+function onModelInput(inp,id){
+  const d=designs.find(d=>d.id===id); if(!d) return;
+  d['model-name']=inp.value; updHeader(id); renderSbDesigns();
+  // autocomplete
+  const ac=document.getElementById('ac-'+id); if(!ac) return;
+  const q=inp.value; if(!q){ac.style.display='none';return;}
+  const hits=shapes.filter(s=>s.name.toLowerCase().includes(q.toLowerCase())).slice(0,10);
+  if(!hits.length){ac.style.display='none';return;}
+  ac.innerHTML=hits.map(s=>`<div style="padding:6px 10px;cursor:pointer;font-size:12px;border-bottom:1px solid var(--cream);display:flex;justify-content:space-between;"
+    onmousedown="pickModel('${id}','${x(s.name)}');event.preventDefault();"
+    onmouseover="this.style.background='var(--cream)'" onmouseout="this.style.background=''">
+    <span>${x(s.name)}</span><span style="color:var(--muted);font-size:10px;">${s.cap} oz</span>
+  </div>`).join('');
+  ac.style.display='block';
+}
+function pickModel(id,name){
+  const d=designs.find(d=>d.id===id); if(!d) return;
+  d['model-name']=name;
+  const inp=document.getElementById(`f-${id}-model-name`); if(inp) inp.value=name;
+  const ac=document.getElementById('ac-'+id); if(ac) ac.style.display='none';
+  updHeader(id); renderSbDesigns();
+}
+document.addEventListener('click',e=>{
+  // close autocomplete dropdowns
+  document.querySelectorAll('[id^="ac-"]').forEach(ac=>{ if(!ac.contains(e.target)) ac.style.display='none'; });
+  // lightbox
+  if(e.target.matches('img[data-lb]')&&e.target.src){ imgLightbox(e.target.src); }
+  // tech chip toggle
+  if(e.target.matches('.sch[data-did]')){
+    const {did,cat,tech}=e.target.dataset;
+    toggleT(did,cat,tech);
+  }
+  // addtech button
+  if(e.target.matches('[data-action="addtech"]')){
+    const {did,cat,inp}=e.target.dataset;
+    const inpEl=document.getElementById(inp);
+    if(inpEl){ addTech(did,cat,inpEl.value); inpEl.value=''; inpEl.focus(); }
+  }
+  // delete tech from library (× on chip)
+  if(e.target.matches('[data-action="deltech"]')){
+    e.stopPropagation(); // prevent chip toggle
+    const {matcat,cat,tech}=e.target.dataset;
+    deleteTech(matcat,cat,tech);
+  }
+});
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='Enter'&&e.target.matches('[data-action="addtech-enter"]')){
+    e.preventDefault();
+    const {did,cat}=e.target.dataset;
+    addTech(did,cat,e.target.value);
+    e.target.value='';
+  }
+});
+
+function onMatCat(id,val){
+  const d=designs.find(d=>d.id===id); if(!d) return;
+  d['material-cat']=val; d['tech-sel']={};
+  // rebuild card
+  const old=document.getElementById('dc-'+id); if(!old) return;
+  const tmp=document.createElement('div'); tmp.innerHTML=buildDC(d,designs.findIndex(x=>x.id===id));
+  old.parentNode.replaceChild(tmp.firstElementChild,old);
+  attachEv(d); setupImgZone(d); setupTrImgZone(d);
+  renderSbDesigns();
+}
+
+function toggleDC(id){
+  const d=designs.find(d=>d.id===id); if(!d) return;
+  d.expanded=!d.expanded;
+  const b=document.getElementById('dcbd-'+id),c=document.querySelector(`#dc-${id} .chev`);
+  if(b) b.classList.toggle('open',d.expanded);
+  if(c) c.classList.toggle('open',d.expanded);
+}
+function updHeader(id){
+  const d=designs.find(d=>d.id===id); if(!d) return;
+  const nt=document.getElementById('dct-'+id);
+  if(nt) nt.innerHTML=d['model-name']?x(d['model-name']):'<span style="color:var(--muted);font-style:italic;">No Model Name</span>';
+  const fo=factories.find(f=>f.code===d.factory);
+  const ns=document.getElementById('dcs-'+id);
+  if(ns) ns.textContent=fo?`${fo.code} — ${fo.name.split(' ').slice(0,3).join(' ')}…`:(d.factory||'No factory');
+}
+function setF(id,k,v){ const d=designs.find(d=>d.id===id); if(d) d[k]=v; }
+function setTrack(id,yes){
+  const d=designs.find(d=>d.id===id); if(!d) return;
+  d['track-yes']=yes;
+  const bl=document.getElementById('tr-block-'+id);
+  if(bl) bl.style.display=yes?'':'none';
+}
+
+// ════════════════════════════════════════════
+// TRACK RECORD ENTRIES
+// ════════════════════════════════════════════
+// temp storage for track image being pasted
+let _trImgTemp = {};
+
+function setupTrImgZone(d){
+  const z=document.getElementById('triz-'+d.id); if(!z) return;
+  _trImgTemp[d.id]=null;
+  z.addEventListener('click',()=>z.focus());
+  z.addEventListener('paste',ev=>{
+    ev.preventDefault();
+    const items=ev.clipboardData&&ev.clipboardData.items;
+    if(!items) return;
+    for(let i=0;i<items.length;i++){
+      if(items[i].type.indexOf('image')!==-1){
+        const blob=items[i].getAsFile(); if(!blob) continue;
+        const fr=new FileReader();
+        fr.onload=ev2=>{ _trImgTemp[d.id]=ev2.target.result; z.innerHTML=`<img style="max-width:100%;max-height:40px;border-radius:3px;" src="${ev2.target.result}">`; };
+        fr.readAsDataURL(blob); break;
+      }
+    }
+  });
+  z.addEventListener('dragover',ev=>{ ev.preventDefault(); z.classList.add('drag'); });
+  z.addEventListener('dragleave',()=>z.classList.remove('drag'));
+  z.addEventListener('drop',ev=>{
+    ev.preventDefault(); z.classList.remove('drag');
+    const file=ev.dataTransfer.files[0]; if(!file||!file.type.startsWith('image')) return;
+    const fr=new FileReader();
+    fr.onload=ev2=>{ _trImgTemp[d.id]=ev2.target.result; z.innerHTML=`<img style="max-width:100%;max-height:40px;border-radius:3px;" src="${ev2.target.result}">`; };
+    fr.readAsDataURL(file);
+  });
+}
+
+function addTrackEntry(id){
+  const d=designs.find(d=>d.id===id); if(!d) return;
+  const reg=document.getElementById('tr-reg-'+id).value.trim();
+  const sku=document.getElementById('tr-sku-'+id).value.trim();
+  if(!reg){ toast('Enter a region name'); return; }
+  if(!d['track-entries']) d['track-entries']=[];
+  d['track-entries'].push({ region:reg, sku:sku, img:_trImgTemp[id]||null });
+  _trImgTemp[id]=null;
+  // re-render entries area
+  const cont=document.getElementById('tr-entries-'+id);
+  if(cont) cont.innerHTML=d['track-entries'].map((te,ti)=>buildTrEntry(id,te,ti)).join('');
+  document.getElementById('tr-reg-'+id).value='';
+  document.getElementById('tr-sku-'+id).value='';
+  const tz=document.getElementById('triz-'+id);
+  if(tz) tz.innerHTML=`<div class="iz-hint"><span style="font-size:14px;">🖼</span><small style="font-size:9px;">Ctrl+V / drop</small></div>`;
+  setupTrImgZone(d);
+  toast('Region added');
+}
+
+function buildTrEntry(id,te,ti){
+  return `<div class="tr-entry" id="tre-${id}-${ti}">
+    ${te.img?`<img class="tr-thumb" data-lb="1" style="cursor:zoom-in;" src="${te.img}">`:`<div class="tr-thumb-ph">🌍</div>`}
+    <div class="tr-entry-info">
+      <div class="tr-entry-region">${x(te.region||'—')}</div>
+      <div class="tr-entry-sku">${te.sku?'SKU: '+x(te.sku):''}</div>
+    </div>
+    <button class="btn bd bxs" onclick="delTrackEntry('${id}',${ti})">✕</button>
+  </div>`;
+}
+
+function delTrackEntry(id,ti){
+  const d=designs.find(d=>d.id===id); if(!d) return;
+  d['track-entries'].splice(ti,1);
+  const cont=document.getElementById('tr-entries-'+id);
+  if(cont) cont.innerHTML=d['track-entries'].map((te,i)=>buildTrEntry(id,te,i)).join('');
+}
+
+// ════════════════════════════════════════════
+// TECH TOGGLE
+// ════════════════════════════════════════════
+function toggleT(id,catName,techName){
+  const d=designs.find(d=>d.id===id); if(!d) return;
+  if(!d['tech-sel']) d['tech-sel']={};
+  if(!d['tech-sel'][catName]) d['tech-sel'][catName]=[];
+  const arr=d['tech-sel'][catName];
+  const i=arr.indexOf(techName);
+  if(i===-1) arr.push(techName); else arr.splice(i,1);
+  const cat=d['material-cat']; if(!cat||!TECH_LIB[cat]) return;
+  rerenderTechRow(d, cat, catName);
+}
+function rerenderTechRow(d, cat, catName){
+  const rowId='tc-'+d.id+'-'+catName.replace(/ /g,'_');
+  const row=document.getElementById(rowId);
+  if(!row) return;
+  const sel=(d['tech-sel']||{})[catName]||[];
+  row.innerHTML=(TECH_LIB[cat][catName]||[]).map(t=>{
+    const on=sel.includes(t);
+    const sp=document.createElement('span');
+    sp.className='sch'+(on?' on':'');
+    sp.dataset.did=d.id; sp.dataset.cat=catName; sp.dataset.tech=t;
+    // label
+    const lbl=document.createElement('span');
+    lbl.textContent=t;
+    sp.appendChild(lbl);
+    // delete ×
+    const dx=document.createElement('span');
+    dx.className='sch-del';
+    dx.textContent='×';
+    dx.dataset.action='deltech';
+    dx.dataset.matcat=cat;
+    dx.dataset.cat=catName;
+    dx.dataset.tech=t;
+    sp.appendChild(dx);
+    return sp.outerHTML;
+  }).join('');
+}
+// Re-render ALL open design cards of a given material category
+function rerenderAllTechForCat(matCat, catName){
+  designs.forEach(d=>{
+    if(d['material-cat']!==matCat) return;
+    rerenderTechRow(d, matCat, catName);
+  });
+}
+function deleteTech(matCat, catName, techName){
+  if(!confirm('Remove "'+techName+'" from the library? This will also deselect it from all current designs.')) return;
+  // Remove from library
+  if(TECH_LIB[matCat]&&TECH_LIB[matCat][catName]){
+    TECH_LIB[matCat][catName]=TECH_LIB[matCat][catName].filter(t=>t!==techName);
+  }
+  // Remove from all designs' selections
+  designs.forEach(d=>{
+    if(d['material-cat']!==matCat) return;
+    if(d['tech-sel']&&d['tech-sel'][catName]){
+      d['tech-sel'][catName]=d['tech-sel'][catName].filter(t=>t!==techName);
+    }
+  });
+  // Re-render all open cards of this matcat + catName
+  rerenderAllTechForCat(matCat, catName);
+  // Update sidebar library
+  renderSbLibrary();
+  toast('"'+techName+'" removed from library');
+}
+function addTech(id,catName,rawVal){
+  const val=rawVal.trim(); if(!val) return;
+  const d=designs.find(d=>d.id===id); if(!d) return;
+  const cat=d['material-cat']; if(!cat||!TECH_LIB[cat]) return;
+  if(!TECH_LIB[cat][catName]) TECH_LIB[cat][catName]=[];
+  if(!TECH_LIB[cat][catName].includes(val)) TECH_LIB[cat][catName].push(val);
+  if(!d['tech-sel']) d['tech-sel']={};
+  if(!d['tech-sel'][catName]) d['tech-sel'][catName]=[];
+  if(!d['tech-sel'][catName].includes(val)) d['tech-sel'][catName].push(val);
+  // update all open designs of same cat
+  rerenderTechRow(d, cat, catName);
+  designs.forEach(dd=>{
+    if(dd.id===id||dd['material-cat']!==cat) return;
+    rerenderTechRow(dd, cat, catName);
+  });
+  renderSbLibrary(); toast('"'+val+'" added');
+}
+
+// ════════════════════════════════════════════
+// QUALITY CONCERN (multi-select)
+// ════════════════════════════════════════════
+function toggleQC(id,opt){
+  const d=designs.find(d=>d.id===id); if(!d) return;
+  if(!d['qc-flags']) d['qc-flags']=[];
+  const i=d['qc-flags'].indexOf(opt);
+  if(i===-1) d['qc-flags'].push(opt); else d['qc-flags'].splice(i,1);
+  rerenderQCChips(id);
+}
+function addQCOption(id,rawVal){
+  const val=rawVal.trim(); if(!val) return;
+  if(!QC_OPTIONS.includes(val)) QC_OPTIONS.push(val);
+  const d=designs.find(d=>d.id===id); if(!d) return;
+  if(!d['qc-flags']) d['qc-flags']=[];
+  if(!d['qc-flags'].includes(val)) d['qc-flags'].push(val);
+  // re-render QC chips in ALL designs
+  designs.forEach(dd=>rerenderQCChips(dd.id));
+  toast(`"${val}" added to QC options`);
+}
+function delQCOption(opt){
+  QC_OPTIONS=QC_OPTIONS.filter(o=>o!==opt);
+  designs.forEach(d=>{ d['qc-flags']=(d['qc-flags']||[]).filter(f=>f!==opt); rerenderQCChips(d.id); });
+}
+function rerenderQCChips(id){
+  const el=document.getElementById('qcc-'+id); if(!el) return;
+  const d=designs.find(d=>d.id===id); if(!d) return;
+  el.innerHTML=QC_OPTIONS.map(opt=>{
+    const on=(d['qc-flags']||[]).includes(opt);
+    return `<span class="qc-chip ${on?'on':''}" onclick="toggleQC('${id}','${x(opt)}')">${x(opt)}<span class="cx" onclick="delQCOption('${x(opt)}');event.stopPropagation();">×</span></span>`;
+  }).join('');
+}
+
+// ════════════════════════════════════════════
+// IMAGE ZONE
+// ════════════════════════════════════════════
+function setupImgZone(d){
+  const z=document.getElementById('iz-'+d.id); if(!z) return;
+  z.addEventListener('click',()=>z.focus());
+  z.addEventListener('paste',ev=>{
+    ev.preventDefault();
+    const items=ev.clipboardData&&ev.clipboardData.items; if(!items) return;
+    for(let i=0;i<items.length;i++){
+      if(items[i].type.indexOf('image')!==-1){
+        const blob=items[i].getAsFile(); if(!blob) continue;
+        const fr=new FileReader();
+        fr.onload=ev2=>{ d.image=ev2.target.result; rerenderImg(d); };
+        fr.readAsDataURL(blob); break;
+      }
+    }
+  });
+  z.addEventListener('dragover',ev=>{ ev.preventDefault(); z.classList.add('drag'); });
+  z.addEventListener('dragleave',()=>z.classList.remove('drag'));
+  z.addEventListener('drop',ev=>{
+    ev.preventDefault(); z.classList.remove('drag');
+    const file=ev.dataTransfer.files[0]; if(!file||!file.type.startsWith('image')) return;
+    const fr=new FileReader(); fr.onload=ev2=>{ d.image=ev2.target.result; rerenderImg(d); }; fr.readAsDataURL(file);
+  });
+  setupTrImgZone(d);
+}
+function rerenderImg(d){
+  const z=document.getElementById('iz-'+d.id); if(!z) return;
+  if(d.image){
+    z.classList.add('has');
+    z.innerHTML=`<img class="iz-img" data-lb="1" style="cursor:zoom-in;" src="${d.image}"><div class="iz-acts"><button class="btn bd bxs" onclick="clearImg('${d.id}');event.stopPropagation();">✕</button></div>`;
+  } else {
+    z.classList.remove('has');
+    z.innerHTML=`<div class="iz-hint"><span class="ic">🖼</span><p>Click then Paste</p><small>Ctrl+V · Drag &amp; Drop</small></div>`;
+    setupImgZone(d);
+  }
+}
+function clearImg(id){ const d=designs.find(d=>d.id===id); if(d){ d.image=null; rerenderImg(d); } }
+function handleImgUpload(input,id){
+  const file=input.files[0]; if(!file||!file.type.startsWith('image')) return;
+  const fr=new FileReader();
+  fr.onload=ev=>{ const d=designs.find(d=>d.id===id); if(!d) return; d.image=ev.target.result; rerenderImg(d); };
+  fr.readAsDataURL(file);
+  input.value='';
+}
+function handleTrImgUpload(input,id){
+  const file=input.files[0]; if(!file||!file.type.startsWith('image')) return;
+  const fr=new FileReader();
+  fr.onload=ev=>{
+    _trImgTemp[id]=ev.target.result;
+    const z=document.getElementById('triz-'+id); if(!z) return;
+    z.innerHTML=`<img style="max-width:100%;max-height:40px;border-radius:3px;object-fit:contain;" src="${ev.target.result}">`;
+  };
+  fr.readAsDataURL(file);
+  input.value='';
+}
+
+// ════════════════════════════════════════════
+// SIDEBAR
+// ════════════════════════════════════════════
+// ── Promotion save/load/delete ──────────────────
+let savedPromotions = JSON.parse(localStorage.getItem('sbj-promotions')||'{}');
+
+function savePromotion(){
+  syncAllFromDOM();
+  const name=(document.getElementById('p-name').value||'').trim();
+  if(!name){ toast('Enter a Promotion Name first'); return; }
+  const snap={
+    project:{
+      name:document.getElementById('p-name').value,
+      timing:document.getElementById('p-timing').value,
+      gtm:document.getElementById('p-gtm').value,
+      deadline:document.getElementById('p-deadline').value,
+      prepby:document.getElementById('p-prepby').value,
+      notes:document.getElementById('p-notes').value,
+    },
+    designs: designs.map(d=>({...d,'track-entries':(d['track-entries']||[]).map(te=>({...te})),'tech-sel':JSON.parse(JSON.stringify(d['tech-sel']||{})),'qc-flags':[...(d['qc-flags']||[])]})),
+    savedAt: new Date().toISOString(),
+  };
+  savedPromotions[name]=snap;
+  localStorage.setItem('sbj-promotions',JSON.stringify(savedPromotions));
+  renderSbPromos(); toast('Saved: '+name);
+}
+
+function loadPromotion(name){
+  if(!confirm('Load "'+name+'"? Current data will be replaced.')) return;
+  const snap=savedPromotions[name]; if(!snap) return;
+  const p=snap.project||{};
+  ['name','timing','gtm','deadline','prepby','notes'].forEach(k=>{
+    const el=document.getElementById('p-'+k); if(el) el.value=p[k]||'';
+  });
+  document.getElementById('pdn').textContent=p.name||' — ';
+  dctr=0;
+  designs=(snap.designs||[]).map(d=>{ dctr++; return {...d}; });
+  rerender(); toast('Loaded: '+name);
+}
+
+function deletePromotion(name){
+  if(!confirm('Delete "'+name+'"?')) return;
+  delete savedPromotions[name];
+  localStorage.setItem('sbj-promotions',JSON.stringify(savedPromotions));
+  renderSbPromos(); toast('Deleted: '+name);
+}
+
+function renderSbPromos(){
+  const el=document.getElementById('sb-promos-list'); if(!el) return;
+  const names=Object.keys(savedPromotions);
+  if(!names.length){ el.innerHTML='<div class="tm txs" style="padding:2px 0;">No saved promotions</div>'; return; }
+  el.innerHTML=names.map(name=>{
+    const snap=savedPromotions[name];
+    const dt=snap.savedAt?new Date(snap.savedAt).toLocaleDateString('en-CA'):'';
+    const cnt=(snap.designs||[]).length;
+    return `<div style="padding:6px 7px;border-radius:3px;margin-bottom:2px;background:rgba(255,255,255,.04);cursor:default;">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:4px;">
+        <div style="flex:1;overflow:hidden;">
+          <div style="font-size:11px;font-weight:600;color:var(--paper);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${x(name)}">${x(name)}</div>
+          <div style="font-size:9px;color:rgba(245,242,236,.35);">${cnt} design${cnt!==1?'s':''} · ${dt}</div>
+        </div>
+        <div style="display:flex;gap:3px;flex-shrink:0;">
+          <button class="btn bg" style="padding:3px 7px;font-size:10px;color:var(--al);" onclick="loadPromotion('${x(name).replace(/'/g,"\'")}')">Load</button>
+          <button class="btn bg" style="padding:3px 6px;font-size:10px;color:#e87070;" onclick="deletePromotion('${x(name).replace(/'/g,"\'")}')">✕</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderSbDesigns(){ renderSbPromos(); }
+function renderShapeList(){
+  const q=(document.getElementById('shape-srch')||{}).value||'';
+  const hits=q?shapes.filter(s=>s.name.toLowerCase().includes(q.toLowerCase())):shapes;
+  const el=document.getElementById('shape-list'); if(!el) return;
+  el.innerHTML=hits.map(s=>`<div class="shape-item"><span>${x(s.name)}</span><span class="shape-cap">${s.cap}</span></div>`).join('');
+}
+function addShape(){
+  const name=(document.getElementById('new-shape-name').value||'').trim();
+  const cap=(document.getElementById('new-shape-cap').value||'').trim();
+  if(!name){ toast('Enter a shape name'); return; }
+  shapes.push({name,cap:cap||'-'}); shapes.sort((a,b)=>a.name.localeCompare(b.name));
+  document.getElementById('new-shape-name').value=''; document.getElementById('new-shape-cap').value='';
+  renderShapeList(); toast(`"${name}" added`);
+}
+function renderSbFactories(){
+  const el=document.getElementById('sb-factories'); if(!el) return;
+  el.innerHTML=factories.map(f=>`<div class="fi-row"><span class="fcode">${x(f.code)}</span><span class="fi-name" title="${x(f.name)}">${x(f.name)}</span></div>`).join('');
+}
+function renderSbLibrary(){
+  const el=document.getElementById('sb-library'); if(!el) return;
+  el.innerHTML=Object.entries(TECH_LIB).map(([mc,cats])=>`
+    <div class="lib-cat">
+      <div class="lib-cat-title">${x(mc)}</div>
+      ${Object.entries(cats).map(([cn,items])=>`
+        <div style="margin-bottom:5px;">
+          <div style="font-size:8px;color:rgba(245,242,236,.3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px;">${x(cn)}</div>
+          <div class="lib-chips">${items.map(t=>`<span class="lib-chip">${x(t)}<span class="cx" onclick="delLib('${x(mc)}','${x(cn)}','${x(t)}')">×</span></span>`).join('')}</div>
+          <div class="lib-add">
+            <input class="lib-inp" id="la-${x(mc)}-${x(cn)}" placeholder="+ New" onkeydown="if(event.key==='Enter'){addLib('${x(mc)}','${x(cn)}',this.value);this.value='';}">
+            <button class="btn bg" style="color:var(--al);padding:2px 6px;font-size:9px;" onclick="addLib('${x(mc)}','${x(cn)}',document.getElementById('la-${x(mc)}-${x(cn)}').value);document.getElementById('la-${x(mc)}-${x(cn)}').value='';">Add</button>
+          </div>
+        </div>`).join('')}
+    </div>`).join('<hr style="border:none;border-top:1px solid rgba(255,255,255,.06);margin:6px 0;">');
+}
+function addLib(mc,cn,rawVal){
+  const val=rawVal.trim(); if(!val) return;
+  if(!TECH_LIB[mc]) TECH_LIB[mc]={};
+  if(!TECH_LIB[mc][cn]) TECH_LIB[mc][cn]=[];
+  if(!TECH_LIB[mc][cn].includes(val)) TECH_LIB[mc][cn].push(val);
+  renderSbLibrary(); renderDesigns(); toast(`Added "${val}"`);
+}
+function delLib(mc,cn,val){
+  if(!TECH_LIB[mc]||!TECH_LIB[mc][cn]) return;
+  TECH_LIB[mc][cn]=TECH_LIB[mc][cn].filter(t=>t!==val);
+  renderSbLibrary(); renderDesigns();
+}
+
+// ════════════════════════════════════════════
+// FACTORIES
+// ════════════════════════════════════════════
+function openFMgr(){ renderFMgr(); document.getElementById('mo-factory').classList.add('open'); }
+function renderFMgr(){
+  document.getElementById('factory-modal-list').innerHTML=factories.map((f,i)=>`
+    <div style="display:flex;align-items:center;gap:7px;padding:6px 0;border-bottom:1px solid var(--cream);font-size:12px;">
+      <span style="font-family:'DM Mono',monospace;font-size:10px;font-weight:600;background:var(--cream);padding:2px 6px;border-radius:3px;min-width:40px;text-align:center;">${x(f.code)}</span>
+      <span style="flex:1;">${x(f.name)}</span>
+      <button class="btn bd bxs" onclick="delFactory(${i})">✕</button>
+    </div>`).join('');
+}
+function delFactory(i){ if(!confirm('Remove?')) return; factories.splice(i,1); renderFMgr(); renderSbFactories(); renderDesigns(); }
+function addFactory(){
+  const code=(document.getElementById('nf-code').value||'').trim(), name=(document.getElementById('nf-name').value||'').trim();
+  if(!code||!name){ toast('Enter code and name'); return; }
+  factories.push({code,name}); document.getElementById('nf-code').value=''; document.getElementById('nf-name').value='';
+  renderFMgr(); renderSbFactories(); renderDesigns(); toast('Factory added');
+}
+
+// ════════════════════════════════════════════
+// SYNC ALL FIELDS FROM DOM → data objects
+// Called before generating PDF / Risk to ensure
+// the latest typed values are captured
+// ════════════════════════════════════════════
+function syncAllFromDOM(){
+  designs.forEach(d=>{
+    // plain text / textarea fields
+    ['model-name','material','new-point','qc-notes'].forEach(k=>{
+      const el=document.getElementById(`f-${d.id}-${k}`);
+      if(el) d[k]=el.value;
+    });
+    // select fields
+    const fa=document.getElementById(`f-${d.id}-factory`);
+    if(fa) d.factory=fa.value;
+    const mc=document.getElementById(`f-${d.id}-material-cat`);
+    if(mc) d['material-cat']=mc.value;
+    // radios: new-model
+    const nmY=document.querySelector(`input[name="nm-${d.id}"][value="Yes"]`);
+    if(nmY) d['new-model']=nmY.checked?'Yes':'No';
+    // radios: track-yes
+    const trY=document.querySelector(`input[name="tr-${d.id}"][value="y"]`);
+    if(trY) d['track-yes']=trY.checked;
+    // track region input
+    const tri=document.getElementById(`f-${d.id}-track-region`);
+    if(tri) d['track-region']=tri.value;
+    // QC status radios
+    const qcsRadios=document.querySelectorAll(`input[name="qcs-${d.id}"]`);
+    qcsRadios.forEach(r=>{ if(r.checked) d['qc-status']=r.value; });
+  });
+}
+
+// ════════════════════════════════════════════
+// PDF — build HTML string used for BOTH preview and print
+// ════════════════════════════════════════════
+function buildPDFHTML(){
+  syncAllFromDOM();
+  const p=getPD();
+  const deadline=p.deadline||fmtDate(new Date());
+
+  const il=(lbl,val)=>`<div class="D-inline"><span class="lk">${lbl}:</span>${x(val)||'<span style="color:#ccc;">—</span>'}</div>`;
+
+  let html=`<div class="D">
+<div class="D-hdr">
+  <div class="D-hdr-top">
+    <div>
+      <div class="D-org">Woodmax International</div>
+      <div class="D-title">2D Hazard Analysis</div>
+      <div class="D-subtitle">${x(p.name)||'Proposal'}</div>
+    </div>
+    <div class="D-total-box">
+      <span class="D-total-lbl">Total Designs</span>
+      <span class="D-total-val">${designs.length}</span>
+    </div>
+  </div>
+  <hr class="D-rule">
+  <div class="D-meta">
+    <div class="D-meta-item"><span class="mk">Period</span><span class="mv">${x(p.timing)||'—'}</span></div>
+    <div class="D-meta-item"><span class="mk">Prepared By</span><span class="mv">${x(p.prepby)||'Woodmax'}</span></div>
+    <div class="D-meta-item"><span class="mk">Submission Date</span><span class="mv">${x(deadline)}</span></div>
+    <div class="D-meta-item"><span class="mk">GTM Stage</span><span class="mv">${x(p.gtm)||'—'}</span></div>
+  </div>
+</div>`;
+
+  if(!designs.length){
+    html+=`<div style="text-align:center;padding:36pt;color:#bbb;font-size:9pt;">No designs added.</div>`;
+  } else {
+    designs.forEach((d,idx)=>{
+      const fo=factories.find(f=>f.code===d.factory);
+      const factName=fo?fo.name:(d.factory||'—');
+      const techSel=d['tech-sel']||{};
+      const catEntries=Object.entries(techSel).filter(([,v])=>v&&v.length);
+      const qcFlags=d['qc-flags']||[];
+      const hasQC=qcFlags.length>0||(d['qc-notes']||'').trim();
+      const hasNP=(d['new-point']||'').trim();
+      const hasTrack=d['track-yes']&&(d['track-entries']||[]).length>0;
+      const isNew=d['new-model']==='Yes';
+
+      // Tech list HTML
+      let techHTML='';
+      if(catEntries.length){
+        techHTML=catEntries.map(([cn,items])=>`
+          <div class="D-tech-section">
+            <span class="D-tech-cat">${x(cn)}</span>
+            <ul class="D-tech-items">${items.map(t=>`<li>${x(t)}</li>`).join('')}</ul>
+          </div>`).join('');
+      } else {
+        techHTML=`<span style="font-size:7pt;color:#ccc;font-style:italic;">Not specified</span>`;
+      }
+
+      // QC / New Point
+      let qcHTML='';
+      const allLines=[];
+      if(hasNP){ d['new-point'].split(/\r?\n/).map(l=>l.trim()).filter(Boolean).forEach(l=>allLines.push(l)); }
+      qcFlags.forEach(f=>allLines.push(f));
+      if(d['qc-notes']&&d['qc-notes'].trim()){ d['qc-notes'].split(/\r?\n/).map(l=>l.trim()).filter(Boolean).forEach(l=>allLines.push(l)); }
+      if(allLines.length){
+        qcHTML=`<ul class="D-qc-p">${allLines.map(l=>`<li>${x(l)}</li>`).join('')}</ul>`;
+      } else {
+        qcHTML=`<span style="font-size:7pt;color:#ccc;font-style:italic;">—</span>`;
+      }
+
+      // Track record refs
+      let refsHTML='';
+      if(hasTrack){
+        refsHTML=`<div class="D-refs">${(d['track-entries']||[]).map(te=>`
+          <div class="D-ref">
+            ${te.img?`<img src="${te.img}" alt="">`:`<div class="D-ref-ph">No img</div>`}
+            <div class="D-ref-info">
+              <b>Region: ${x(te.region)}</b>
+              ${te.sku?`SKU No.: ${x(te.sku)}`:''}
+            </div>
+          </div>`).join('')}
+        </div>`;
+      }
+
+      html+=`
+<div class="D-block">
+  <!-- Title bar -->
+  <div class="D-bar">
+    <span class="D-bar-num">#${String(idx+1).padStart(2,'0')}</span>
+    <span class="D-bar-name">${x(d['model-name'])||'—'}</span>
+    ${isNew?`<span class="D-badge-new">New Model</span>`:''}
+  </div>
+
+  <!-- Body: 3 columns -->
+  <div class="D-body">
+
+    <!-- Col 1: Image -->
+    <div class="D-img-col">
+      ${d.image?`<img class="D-ref-img" src="${d.image}" alt="">`:`<div class="D-img-ph">No Image</div>`}
+      ${d['color-variation']||d['pantone']?`
+      <div class="D-color-row">
+        ${d['color-variation']?`<div><span class="lk">Color</span><span class="lv">${x(d['color-variation'])}</span></div>`:''}
+        ${d['pantone']?`<div><span class="lk">Pantone</span><span class="lv" style="font-family:monospace;">${x(d['pantone'])}</span></div>`:''}
+      </div>`:''}
+    </div>
+
+    <!-- Col 2: Basic Info + Technology -->
+    <div class="D-mid">
+      <div class="D-cell">
+        <span class="D-cell-t">Basic Information</span>
+        ${il('Factory',factName)}
+        ${il('Material',d['material'])}
+        ${il('Material Category',d['material-cat'])}
+      </div>
+      <div class="D-cell">
+        <span class="D-cell-t">Technology</span>
+        ${techHTML}
+      </div>
+    </div>
+
+    <!-- Col 3: Product Status + Track Record + QC -->
+    <div class="D-right">
+      <div class="D-cell">
+        <span class="D-cell-t">Product Status</span>
+        ${il('New Model',isNew?'Yes':'No')}
+        ${il('Track Record',d['track-yes']?'Yes':'No')}
+        ${hasTrack?refsHTML:''}
+      </div>
+      <div class="D-cell">
+        <span class="D-cell-t">Quality Concern / New Point</span>
+        ${qcHTML}
+      </div>
+    </div>
+
+  </div><!-- /D-body -->
+</div><!-- /D-block -->`;
+    });
+  }
+
+  html+=`</div>`; // close .D
+  return html;
+}
+
+function openPDF(){
+  const html=buildPDFHTML();
+  document.getElementById('pdf-preview-wrap').innerHTML=
+    `<div style="background:#888;padding:16px;overflow:auto;max-height:80vh;border-radius:4px;">
+       <div style="background:#fff;width:210mm;min-height:200px;margin:0 auto;padding:13mm;box-shadow:0 4px 20px rgba(0,0,0,.3);">
+         ${html}
+       </div>
+     </div>`;
+  document.getElementById('mo-pdf').classList.add('open');
+}
+
+function doPrint(){
+  const html=buildPDFHTML();
+  const pa=document.getElementById('print-area');
+  pa.innerHTML=html;
+  pa.style.display='block';
+  window.print();
+  setTimeout(()=>{ pa.style.display='none'; },1000);
+}
+
+
+
+
+// ════════════════════════════════════════════
+// RISK
+// ════════════════════════════════════════════
+function openRisk(){
+  syncAllFromDOM();
+  const el=document.getElementById('risk-out'); if(!el) return;
+  if(!designs.length){ el.innerHTML=`<div class="es"><span class="em">🛡</span><div>No designs</div></div>`; document.getElementById('mo-risk').classList.add('open'); return; }
+  const CHECKS=[
+    {k:'model-name',l:'Model Name',req:true},
+    {k:'factory',l:'Factory confirmed',req:true},
+    {k:'material-cat',l:'Material Category',req:true},
+    {k:'material',l:'Material Detail',req:false},
+    {k:'tech-sel',l:'Technology selected',req:false,specialTech:true},
+    {k:'new-point',l:'New point noted',req:false},
+    {k:'color-variation',l:'Color variation',req:false},
+    {k:'qc-flags',l:'QC concern reviewed',req:false,special:'qc'},
+  ];
+  let html='';
+  designs.forEach((d,i)=>{
+    html+=`<div style="margin-bottom:14px;border:1px solid var(--border);border-radius:6px;overflow:hidden;">
+      <div style="background:var(--cream);padding:8px 12px;font-weight:600;font-size:12px;border-bottom:1px solid var(--border);">#${i+1} · ${x(d['model-name'])||'—'}</div>
+      <div style="padding:10px 12px;">`;
+    CHECKS.forEach(c=>{
+      let pass,icon,note;
+      if(c.special==='qc'){ const q=(d['qc-flags']||[]).length>0; pass=!q; icon=q?'riwarn':'riok'; note=q?d['qc-flags'].join(', '):'None flagged'; }
+      else if(c.specialTech){ const ts=d['tech-sel']||{}; const total=Object.values(ts).flat().length; pass=total>0; icon=pass?'riok':'rina'; note=pass?Object.values(ts).flat().join(', '):'Not selected'; }
+      else { pass=typeof d[c.k]==='string'&&d[c.k].trim().length>0; icon=pass?'riok':(c.req?'riwarn':'rina'); note=pass?d[c.k]:(c.req?'⚠ Missing':'—'); }
+      const col=icon==='riok'?'#155724':icon==='riwarn'?'#856404':'#8a8a80';
+      const bg=icon==='riok'?'#d4edda':icon==='riwarn'?'#fff3cd':'#ede9df';
+      html+=`<div style="display:flex;align-items:flex-start;gap:7px;padding:5px 0;border-bottom:1px solid var(--cream);font-size:11px;">
+        <div style="width:15px;height:15px;border-radius:50%;background:${bg};color:${col};display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;flex-shrink:0;margin-top:1px;">${pass?'✓':(icon==='riwarn'?'!':'–')}</div>
+        <div><div style="font-weight:500;">${c.l}${c.req?' <span style="color:var(--accent);">*</span>':''}</div><div style="color:var(--muted);font-size:10px;">${x(String(note||''))}</div></div>
+      </div>`;
+    });
+    html+=`</div></div>`;
+  });
+  el.innerHTML=html; document.getElementById('mo-risk').classList.add('open');
+}
+
+// ════════════════════════════════════════════
+// HELPERS
+// ════════════════════════════════════════════
+function getPD(){ return { name:document.getElementById('p-name').value, timing:document.getElementById('p-timing').value, gtm:document.getElementById('p-gtm').value, deadline:document.getElementById('p-deadline').value, prepby:document.getElementById('p-prepby').value, notes:document.getElementById('p-notes').value }; }
+function updProj(){ const n=document.getElementById('p-name').value; document.getElementById('pdn').textContent=n||' — '; }
+function closeMo(id){ document.getElementById(id).classList.remove('open'); }
+function scrollToDC(id){ const el=document.getElementById('dc-'+id); if(el){ el.scrollIntoView({behavior:'smooth',block:'start'}); const d=designs.find(d=>d.id===id); if(d&&!d.expanded) toggleDC(id); } }
+function fmtDate(d){ return `${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}`; }
+function x(s){ if(s==null) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2000); }
+function mkES(){ const d=document.createElement('div'); d.className='es'; d.id='es'; d.innerHTML=`<span class="em">✏️</span><div style="font-weight:600;margin-bottom:3px;">No designs yet</div><div class="tsm">Click "+ Add Design" to start.</div>`; return d; }
+
+// Auto-expand textarea
+function autoExpand(el){
+  el.style.height='auto';
+  el.style.height=(el.scrollHeight+2)+'px';
+}
+
+// Lightbox
+function imgLightbox(src){
+  const ov=document.createElement('div');
+  ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:9999;display:flex;align-items:center;justify-content:center;cursor:zoom-out;';
+  const img=document.createElement('img');
+  img.src=src; img.style.cssText='max-width:90vw;max-height:90vh;object-fit:contain;border-radius:4px;box-shadow:0 8px 40px rgba(0,0,0,.5);';
+  ov.appendChild(img); ov.addEventListener('click',()=>ov.remove());
+  document.body.appendChild(ov);
+}
+
+document.querySelectorAll('.mo').forEach(m=>m.addEventListener('click',ev=>{ if(ev.target===m) m.classList.remove('open'); }));
+
+function sbTab(name){
+  document.querySelectorAll('.sb-tab').forEach((t,i)=>{
+    const names=['promos','shapes','factories','library'];
+    t.classList.toggle('active', names[i]===name);
+  });
+  document.querySelectorAll('.sb-panel').forEach(p=>p.classList.remove('active'));
+  const panel=document.getElementById('sbp-'+name);
+  if(panel) panel.classList.add('active');
+}
+
+// INIT
+renderSbPromos(); renderSbFactories(); renderSbLibrary(); renderShapeList();
+</script>
+</body>
+</html>
