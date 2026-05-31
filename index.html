@@ -202,16 +202,13 @@ header{background:var(--ink);color:var(--paper);padding:0 20px;display:flex;alig
 
 /* ════════════════════════════════════════════════════
    SBJ 2D HAZARD ANALYSIS — PRINT DOCUMENT STYLES
-   Target: A4 portrait, professional supplier proposal
+   Optimised for A4 portrait, Japanese minimal style
 ════════════════════════════════════════════════════ */
-
-/* Base */
-.D{font-family:'DM Sans',sans-serif;font-size:8.5pt;color:#111;line-height:1.45;background:#fff;}
-
+.D{font-family:'DM Sans',sans-serif;font-size:10pt;color:#111;line-height:1.45;background:#fff;}
 /* Header */
 .D-hdr{margin-bottom:0;padding-bottom:6pt;}
 .D-hdr-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4pt;}
-.D-org{font-size:6.5pt;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#555;margin-bottom:2pt;}
+.D-org{font-size:7pt;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#555;margin-bottom:2pt;}
 .D-title{font-family:'DM Serif Display',serif;font-size:20pt;font-weight:400;color:#111;letter-spacing:-.02em;line-height:1;}
 .D-subtitle{font-size:10pt;font-weight:600;color:#333;margin-top:2pt;letter-spacing:-.01em;}
 .D-total-box{text-align:right;}
@@ -221,95 +218,64 @@ header{background:var(--ink);color:var(--paper);padding:0 20px;display:flex;alig
 .D-meta{display:grid;grid-template-columns:repeat(4,1fr);padding:5pt 0 5pt;border-bottom:0.5pt solid #ccc;}
 .D-meta-item .mk{font-size:5.5pt;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#aaa;display:block;margin-bottom:1pt;}
 .D-meta-item .mv{font-size:8.5pt;color:#111;}
-
 /* Design block */
 .D-block{break-inside:avoid;page-break-inside:avoid;margin-bottom:7pt;border:0.5pt solid #ccc;}
-
-/* Title bar — lighter, not full black */
-.D-bar{
-  display:flex;align-items:center;gap:7pt;
-  padding:4pt 8pt;
-  border-bottom:0.5pt solid #ccc;
-  background:#f5f5f5;
-}
-.D-bar-num{
-  font-family:'DM Mono',monospace;font-size:7.5pt;font-weight:600;
-  background:#111;color:#fff;
-  padding:1.5pt 5pt;border-radius:2pt;flex-shrink:0;
-}
-.D-bar-name{font-size:10.5pt;font-weight:600;letter-spacing:-.01em;flex:1;color:#111;}
-.D-badge-new{
-  font-size:6pt;font-weight:700;text-transform:uppercase;letter-spacing:.04em;
-  padding:1.5pt 6pt;border:0.5pt solid #333;border-radius:2pt;color:#333;
-}
-
-/* Body layout: image | middle | right */
-.D-body{display:grid;grid-template-columns:100pt 1fr 130pt;border-top:0pt;}
-
-/* Image column */
-.D-img-col{
-  border-right:0.5pt solid #e0e0e0;
-  padding:7pt;background:#fafafa;
-  display:flex;flex-direction:column;align-items:center;gap:4pt;
-}
-.D-ref-img{width:100%;max-height:80pt;object-fit:contain;display:block;}
-.D-img-ph{width:100%;height:60pt;display:flex;align-items:center;justify-content:center;font-size:6.5pt;color:#ccc;border:0.5pt dashed #ddd;}
-
-/* Middle column */
+/* Title bar */
+.D-bar{display:flex;align-items:center;gap:7pt;padding:4pt 8pt;border-bottom:0.5pt solid #ccc;background:#f5f5f5;}
+.D-bar-num{font-family:'DM Mono',monospace;font-size:8.5pt;font-weight:600;background:#111;color:#fff;padding:1.5pt 5pt;border-radius:2pt;flex-shrink:0;}
+.D-bar-name{font-size:11pt;font-weight:600;letter-spacing:-.01em;flex:1;color:#111;}
+.D-badge-new{font-size:6pt;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:2pt 7pt;border:0.5pt solid #333;border-radius:2pt;color:#333;}
+/* Body: 3-col */
+.D-body{display:grid;grid-template-columns:100pt 1fr 120pt;}
+/* Image col */
+.D-img-col{border-right:0.5pt solid #e0e0e0;padding:7pt;background:#fafafa;display:flex;flex-direction:column;align-items:center;gap:4pt;}
+.D-ref-img{width:100%;max-height:78pt;object-fit:contain;display:block;}
+.D-img-ph{width:100%;height:58pt;display:flex;align-items:center;justify-content:center;font-size:6.5pt;color:#ccc;border:0.5pt dashed #ddd;}
+/* Middle + Right col */
 .D-mid{border-right:0.5pt solid #e0e0e0;display:flex;flex-direction:column;}
-
-/* Right column */
 .D-right{display:flex;flex-direction:column;}
-
-/* Cell inside middle/right */
-.D-cell{padding:6pt 8pt;flex:1;}
+/* Cell */
+.D-cell{padding:5pt 7pt;flex:1;}
 .D-cell+.D-cell{border-top:0.5pt solid #ebebeb;}
-.D-cell-t{
-  font-size:5.5pt;font-weight:700;text-transform:uppercase;letter-spacing:.09em;
-  color:#aaa;display:block;margin-bottom:4pt;padding-bottom:2pt;
-  border-bottom:0.5pt solid #ebebeb;
-}
-
-/* Inline field rows — "Label: Value" style */
-.D-inline{font-size:8pt;color:#111;margin-bottom:2.5pt;line-height:1.3;}
-.D-inline:last-child{margin-bottom:0;}
-.D-inline .lk{color:#999;font-size:7.5pt;margin-right:2pt;}
-
-/* Technology — compact list */
-.D-tech-section{margin-bottom:4pt;}
-.D-tech-section:last-child{margin-bottom:0;}
-.D-tech-cat{font-size:5.5pt;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#aaa;display:block;margin-bottom:1.5pt;}
-.D-tech-items{font-size:7.5pt;color:#222;line-height:1.5;padding-left:6pt;}
-.D-tech-items li{list-style:disc;margin-bottom:0;}
-
-/* Track record refs */
+/* Section title: 11pt #888 */
+.D-cell-t{font-size:11pt;font-weight:600;color:#888;display:block;margin-bottom:4pt;padding-bottom:2pt;border-bottom:0.5pt solid #ebebeb;text-transform:uppercase;letter-spacing:.02em;}
+.D-cell-t+.D-cell-t{margin-top:6pt;}
+/* Label: 11pt #888 | Value: 10pt #333 */
+.D-fl{margin-bottom:2pt;line-height:1.35;}
+.D-fl:last-child{margin-bottom:0;}
+.D-fl .lk{color:#888;font-size:11pt;font-weight:400;}
+.D-fl .lv{color:#333;font-size:10pt;font-weight:400;}
+/* Technology */
+.D-tech-sec{margin-bottom:4pt;}
+.D-tech-sec:last-child{margin-bottom:0;}
+.D-tech-lbl{color:#888;font-size:11pt;font-weight:400;display:block;margin-bottom:1.5pt;}
+.D-tech-list{list-style:none;padding:0;margin:0;}
+.D-tech-list li{font-size:10pt;color:#333;line-height:1.45;padding-left:8pt;position:relative;}
+.D-tech-list li::before{content:"·";position:absolute;left:0;color:#aaa;font-weight:700;}
+/* Track refs */
 .D-refs{display:flex;flex-wrap:wrap;gap:5pt;margin-top:4pt;}
 .D-ref{display:flex;flex-direction:column;gap:2pt;align-items:flex-start;}
 .D-ref img{width:46pt;height:36pt;object-fit:contain;border:0.5pt solid #e0e0e0;background:#f8f8f8;display:block;}
-.D-ref-ph{width:46pt;height:36pt;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:6pt;color:#bbb;border:0.5pt solid #e0e0e0;}
-.D-ref-info{font-size:6.5pt;color:#444;line-height:1.5;}
-.D-ref-info b{color:#111;display:block;}
-
-/* QC / New Point — clean paragraph */
-.D-qc-p{font-size:7.5pt;color:#222;line-height:1.6;margin:0;padding:0;}
-.D-qc-p li{list-style:disc;margin-left:8pt;margin-bottom:1pt;}
-
-/* Color row under image */
-.D-color-row{width:100%;border-top:0.5pt solid #e8e8e8;padding-top:4pt;}
-.D-color-row .lk{font-size:5.5pt;color:#aaa;font-weight:700;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:0.5pt;}
-.D-color-row .lv{font-size:7.5pt;color:#333;}
-
+.D-ref-info{font-size:6.5pt;color:#555;line-height:1.5;}
+.D-ref-info b{color:#333;font-size:7pt;display:block;}
+/* QC + NP lists */
+.D-qc-list{list-style:none;padding:0;margin:0;}
+.D-qc-list li{font-size:10pt;color:#333;line-height:1.5;padding-left:8pt;position:relative;margin-bottom:1pt;}
+.D-qc-list li::before{content:"·";position:absolute;left:0;color:#aaa;font-weight:700;}
+/* Empty dash */
+.D-dash{font-size:10pt;color:#ccc;font-style:italic;}
 /* Print */
 @media print{
   body > *{display:none!important;}
   #print-area{display:block!important;position:static!important;}
   @page{size:A4 portrait;margin:13mm 13mm 15mm 13mm;}
-  .D{font-size:8pt;}
+  .D{font-size:9pt;}
   .D-block{break-inside:avoid;page-break-inside:avoid;}
   .D-bar{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
   .D-bar-num{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
 }
 #print-area{display:none;}
+
 
 
 /* MISC */
@@ -1398,8 +1364,7 @@ function buildPDFHTML(){
   const p=getPD();
   const deadline=p.deadline||fmtDate(new Date());
 
-  const il=(lbl,val)=>`<div class="D-inline"><span class="lk">${lbl}:</span>${x(val)||'<span style="color:#ccc;">—</span>'}</div>`;
-
+  // ── header ──────────────────────────────────────────────
   let html=`<div class="D">
 <div class="D-hdr">
   <div class="D-hdr-top">
@@ -1427,45 +1392,43 @@ function buildPDFHTML(){
   } else {
     designs.forEach((d,idx)=>{
       const fo=factories.find(f=>f.code===d.factory);
-      const factName=fo?fo.name:(d.factory||'—');
+      const factName=fo?fo.name:(d.factory||'');
       const techSel=d['tech-sel']||{};
       const catEntries=Object.entries(techSel).filter(([,v])=>v&&v.length);
       const qcFlags=d['qc-flags']||[];
-      const hasQC=qcFlags.length>0||(d['qc-notes']||'').trim();
-      const hasNP=(d['new-point']||'').trim();
+      const npText=(d['new-point']||'').trim();
+      const qcText=(d['qc-notes']||'').trim();
+      const hasQC=qcFlags.length>0||qcText;
+      const hasNP=npText.length>0;
       const hasTrack=d['track-yes']&&(d['track-entries']||[]).length>0;
       const isNew=d['new-model']==='Yes';
 
-      // Tech list HTML
+      // capacity from shapes list
+      const shape=shapes.find(s=>s.name===d['model-name']);
+      const cap=shape&&shape.cap&&shape.cap!=='-'?shape.cap+'oz ':' ';
+      const barName=cap+x(d['model-name']||'—');
+
+      // ── Tech ──
       let techHTML='';
       if(catEntries.length){
         techHTML=catEntries.map(([cn,items])=>`
-          <div class="D-tech-section">
-            <span class="D-tech-cat">${x(cn)}</span>
-            <ul class="D-tech-items">${items.map(t=>`<li>${x(t)}</li>`).join('')}</ul>
+          <div class="D-tech-sec">
+            <span class="D-tech-lbl">${x(cn)}</span>
+            <ul class="D-tech-list">${items.map(t=>`<li>${x(t)}</li>`).join('')}</ul>
           </div>`).join('');
       } else {
-        techHTML=`<span style="font-size:7pt;color:#ccc;font-style:italic;">Not specified</span>`;
+        techHTML=`<span class="D-dash">—</span>`;
       }
 
-      // QC / New Point
-      let qcHTML='';
-      const allLines=[];
-      if(hasNP){ d['new-point'].split(/\r?\n/).map(l=>l.trim()).filter(Boolean).forEach(l=>allLines.push(l)); }
-      qcFlags.forEach(f=>allLines.push(f));
-      if(d['qc-notes']&&d['qc-notes'].trim()){ d['qc-notes'].split(/\r?\n/).map(l=>l.trim()).filter(Boolean).forEach(l=>allLines.push(l)); }
-      if(allLines.length){
-        qcHTML=`<ul class="D-qc-p">${allLines.map(l=>`<li>${x(l)}</li>`).join('')}</ul>`;
-      } else {
-        qcHTML=`<span style="font-size:7pt;color:#ccc;font-style:italic;">—</span>`;
-      }
-
-      // Track record refs
+      // ── Track refs (only if image exists) ──
       let refsHTML='';
       if(hasTrack){
-        refsHTML=`<div class="D-refs">${(d['track-entries']||[]).map(te=>`
+        const withImg=(d['track-entries']||[]).filter(te=>te.img);
+        const all=(d['track-entries']||[]);
+        // always show all entries; hide img block if no img
+        refsHTML=`<div class="D-refs">${all.map(te=>`
           <div class="D-ref">
-            ${te.img?`<img src="${te.img}" alt="">`:`<div class="D-ref-ph">No img</div>`}
+            ${te.img?`<img src="${te.img}" alt="">`: ''}
             <div class="D-ref-info">
               <b>Region: ${x(te.region)}</b>
               ${te.sku?`SKU No.: ${x(te.sku)}`:''}
@@ -1474,62 +1437,73 @@ function buildPDFHTML(){
         </div>`;
       }
 
+      // ── New Point lines ──
+      let npHTML='';
+      if(hasNP){
+        const lines=npText.split(/\r?\n/).map(l=>l.trim()).filter(Boolean);
+        npHTML=`<ul class="D-qc-list">${lines.map(l=>`<li>${x(l)}</li>`).join('')}</ul>`;
+      } else {
+        npHTML=`<span class="D-dash">—</span>`;
+      }
+
+      // ── Quality Concern ──
+      let qcHTML='';
+      const qcLines=[
+        ...qcFlags,
+        ...(qcText?qcText.split(/\r?\n/).map(l=>l.trim()).filter(Boolean):[])
+      ];
+      if(qcLines.length){
+        qcHTML=`<ul class="D-qc-list">${qcLines.map(l=>`<li>${x(l)}</li>`).join('')}</ul>`;
+      } else {
+        qcHTML=`<span class="D-dash">—</span>`;
+      }
+
       html+=`
 <div class="D-block">
-  <!-- Title bar -->
   <div class="D-bar">
     <span class="D-bar-num">#${String(idx+1).padStart(2,'0')}</span>
-    <span class="D-bar-name">${x(d['model-name'])||'—'}</span>
+    <span class="D-bar-name">${barName}</span>
     ${isNew?`<span class="D-badge-new">New Model</span>`:''}
   </div>
-
-  <!-- Body: 3 columns -->
   <div class="D-body">
-
-    <!-- Col 1: Image -->
+    <!-- Col 1: image -->
     <div class="D-img-col">
       ${d.image?`<img class="D-ref-img" src="${d.image}" alt="">`:`<div class="D-img-ph">No Image</div>`}
-      ${d['color-variation']||d['pantone']?`
-      <div class="D-color-row">
-        ${d['color-variation']?`<div><span class="lk">Color</span><span class="lv">${x(d['color-variation'])}</span></div>`:''}
-        ${d['pantone']?`<div><span class="lk">Pantone</span><span class="lv" style="font-family:monospace;">${x(d['pantone'])}</span></div>`:''}
-      </div>`:''}
     </div>
-
     <!-- Col 2: Basic Info + Technology -->
     <div class="D-mid">
       <div class="D-cell">
         <span class="D-cell-t">Basic Information</span>
-        ${il('Factory',factName)}
-        ${il('Material',d['material'])}
-        ${il('Material Category',d['material-cat'])}
+        ${factName?`<div class="D-fl"><span class="lk">Factory: </span><span class="lv">${x(factName)}</span></div>`:''}
+        ${d['material-cat']?`<div class="D-fl"><span class="lk">Material Category: </span><span class="lv">${x(d['material-cat'])}</span></div>`:''}
+        ${d['material']?`<div class="D-fl"><span class="lk">Material: </span><span class="lv">${x(d['material'])}</span></div>`:''}
       </div>
       <div class="D-cell">
         <span class="D-cell-t">Technology</span>
         ${techHTML}
       </div>
     </div>
-
-    <!-- Col 3: Product Status + Track Record + QC -->
+    <!-- Col 3: Product Status + NP + QC -->
     <div class="D-right">
       <div class="D-cell">
         <span class="D-cell-t">Product Status</span>
-        ${il('New Model',isNew?'Yes':'No')}
-        ${il('Track Record',d['track-yes']?'Yes':'No')}
-        ${hasTrack?refsHTML:''}
+        <div class="D-fl"><span class="lk">New Model: </span><span class="lv">${isNew?'Yes':'No'}</span></div>
+        <div class="D-fl"><span class="lk">Track Record: </span><span class="lv">${d['track-yes']?'Yes':'No'}</span></div>
+        ${refsHTML}
       </div>
       <div class="D-cell">
-        <span class="D-cell-t">Quality Concern / New Point</span>
+        <span class="D-cell-t">New Point</span>
+        ${npHTML}
+        <span class="D-cell-t">Quality Concern</span>
         ${qcHTML}
       </div>
     </div>
-
-  </div><!-- /D-body -->
-</div><!-- /D-block -->`;
+  </div>
+</div>`;
     });
   }
 
-  html+=`</div>`; // close .D
+  html+=`</div>`;
   return html;
 }
 
@@ -1553,12 +1527,6 @@ function doPrint(){
   setTimeout(()=>{ pa.style.display='none'; },1000);
 }
 
-
-
-
-// ════════════════════════════════════════════
-// RISK
-// ════════════════════════════════════════════
 function openRisk(){
   syncAllFromDOM();
   const el=document.getElementById('risk-out'); if(!el) return;
