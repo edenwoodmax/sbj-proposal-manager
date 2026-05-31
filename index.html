@@ -360,7 +360,7 @@ header{background:var(--ink);color:var(--paper);padding:0 20px;display:flex;alig
     </div>
     <div class="fg fg3">
       <div class="fgrp"><label class="fl">Promotion / Project Name <span class="req">*</span></label><input class="fi" id="p-name" placeholder="e.g. Spring 2025 Launch" oninput="updProj()"></div>
-      <div class="fgrp"><label class="fl">Timing / Period <span class="req">*</span></label><input class="fi" id="p-timing" placeholder="e.g. Q2 2025 / Apr–Jun"></div>
+
       <div class="fgrp"><label class="fl">GTM Stage</label>
         <select class="fsel" id="p-gtm">
           <option value="">— Select —</option>
@@ -370,7 +370,7 @@ header{background:var(--ink);color:var(--paper);padding:0 20px;display:flex;alig
         </select>
       </div>
       <div class="fgrp"><label class="fl">Submission Deadline</label><input class="fi" type="date" id="p-deadline"></div>
-      <div class="fgrp"><label class="fl">Prepared by</label><input class="fi" id="p-prepby" placeholder="e.g. Woodmax Eden"></div>
+      <div class="fgrp"><label class="fl">Prepared by</label><input class="fi" id="p-prepby" placeholder="e.g. WOODMAX KY INDUSTRIES CORPORATION"></div>
       <div class="fgrp fgf"><label class="fl">General Notes</label><textarea class="fta" id="p-notes" style="min-height:44px;" placeholder="General notes…"></textarea></div>
     </div>
   </div>
@@ -1160,7 +1160,6 @@ function savePromotion(){
   const snap={
     project:{
       name:document.getElementById('p-name').value,
-      timing:document.getElementById('p-timing').value,
       gtm:document.getElementById('p-gtm').value,
       deadline:document.getElementById('p-deadline').value,
       prepby:document.getElementById('p-prepby').value,
@@ -1369,7 +1368,7 @@ function buildPDFHTML(){
 <div class="D-hdr">
   <div class="D-hdr-top">
     <div>
-      <div class="D-org">Woodmax International</div>
+      <div class="D-org">WOODMAX KY INDUSTRIES CORPORATION</div>
       <div class="D-title">2D Hazard Analysis</div>
       <div class="D-subtitle">${x(p.name)||'Proposal'}</div>
     </div>
@@ -1380,8 +1379,8 @@ function buildPDFHTML(){
   </div>
   <hr class="D-rule">
   <div class="D-meta">
-    <div class="D-meta-item"><span class="mk">Period</span><span class="mv">${x(p.timing)||'—'}</span></div>
-    <div class="D-meta-item"><span class="mk">Prepared By</span><span class="mv">${x(p.prepby)||'Woodmax'}</span></div>
+
+    <div class="D-meta-item"><span class="mk">Prepared By</span><span class="mv">${x(p.prepby)||'WOODMAX KY INDUSTRIES CORPORATION'}</span></div>
     <div class="D-meta-item"><span class="mk">Submission Date</span><span class="mv">${x(deadline)}</span></div>
     <div class="D-meta-item"><span class="mk">GTM Stage</span><span class="mv">${x(p.gtm)||'—'}</span></div>
   </div>
@@ -1405,8 +1404,9 @@ function buildPDFHTML(){
 
       // capacity from shapes list
       const shape=shapes.find(s=>s.name===d['model-name']);
-      const cap=shape&&shape.cap&&shape.cap!=='-'?shape.cap+'oz ':' ';
-      const barName=cap+x(d['model-name']||'—');
+      const capStr=shape&&shape.cap&&shape.cap!=='-'?shape.cap+'oz':'';
+      const barName=x(d['model-name']||'—');
+      const capTag=capStr?`<span style="font-size:9pt;font-weight:400;color:#aaa;margin-left:5pt;">${capStr}</span>`:'';
 
       // ── Tech ──
       let techHTML='';
@@ -1462,7 +1462,7 @@ function buildPDFHTML(){
 <div class="D-block">
   <div class="D-bar">
     <span class="D-bar-num">#${String(idx+1).padStart(2,'0')}</span>
-    <span class="D-bar-name">${barName}</span>
+    <span class="D-bar-name">${barName}${capTag}</span>
     ${isNew?`<span class="D-badge-new">New Model</span>`:''}
   </div>
   <div class="D-body">
@@ -1566,7 +1566,7 @@ function openRisk(){
 // ════════════════════════════════════════════
 // HELPERS
 // ════════════════════════════════════════════
-function getPD(){ return { name:document.getElementById('p-name').value, timing:document.getElementById('p-timing').value, gtm:document.getElementById('p-gtm').value, deadline:document.getElementById('p-deadline').value, prepby:document.getElementById('p-prepby').value, notes:document.getElementById('p-notes').value }; }
+function getPD(){ return { name:document.getElementById('p-name').value, gtm:document.getElementById('p-gtm').value, deadline:document.getElementById('p-deadline').value, prepby:document.getElementById('p-prepby').value, notes:document.getElementById('p-notes').value }; }
 function updProj(){ const n=document.getElementById('p-name').value; document.getElementById('pdn').textContent=n||' — '; }
 function closeMo(id){ document.getElementById(id).classList.remove('open'); }
 function scrollToDC(id){ const el=document.getElementById('dc-'+id); if(el){ el.scrollIntoView({behavior:'smooth',block:'start'}); const d=designs.find(d=>d.id===id); if(d&&!d.expanded) toggleDC(id); } }
