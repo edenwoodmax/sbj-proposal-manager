@@ -730,13 +730,13 @@ function buildDC(d,idx){
       <div class="sub-t">Product Status</div>
       <div class="fg fg2" style="gap:10px;">
         <div class="fgrp">
-          <label class="fl">New Model</label>
+          <label class="fl">New Model in SBJ</label>
           <div class="rrow">
-            <label class="rlabel"><input type="radio" name="nm-${d.id}" value="Yes" ${d['new-model']==='Yes'?'checked':''} onchange="setF('${d.id}','new-model','Yes')"> Yes</label>
-            <label class="rlabel"><input type="radio" name="nm-${d.id}" value="No" ${d['new-model']!=='Yes'?'checked':''} onchange="setF('${d.id}','new-model','No')"> No</label>
+            <label class="rlabel"><input type="radio" name="nm-${d.id}" value="Yes" ${d['new-model']==='Yes'?'checked':''} onchange="setNewModel('${d.id}','Yes')"> Yes</label>
+            <label class="rlabel"><input type="radio" name="nm-${d.id}" value="No" ${d['new-model']!=='Yes'?'checked':''} onchange="setNewModel('${d.id}','No')"> No</label>
           </div>
         </div>
-        <div class="fgrp">
+        <div class="fgrp" id="tr-field-${d.id}" style="${d['new-model']==='Yes'?'':'display:none;'}">
           <label class="fl">Track Record in Other Regions</label>
           <div class="rrow">
             <label class="rlabel"><input type="radio" name="tr-${d.id}" value="y" ${d['track-yes']?'checked':''} onchange="setTrack('${d.id}',true)"> Yes</label>
@@ -744,8 +744,8 @@ function buildDC(d,idx){
           </div>
         </div>
       </div>
-      <!-- Track entries (shown when Yes) -->
-      <div id="tr-block-${d.id}" style="${d['track-yes']?'':'display:none;'}margin-top:10px;">
+      <!-- Track entries (shown when New Model=Yes AND Track=Yes) -->
+      <div id="tr-block-${d.id}" style="${d['new-model']==='Yes'&&d['track-yes']?'':'display:none;'}margin-top:10px;">
         <div class="tr-block">
           <div class="tr-entries" id="tr-entries-${d.id}">${trEntries}</div>
           <!-- Add track entry form -->
@@ -895,6 +895,27 @@ function updHeader(id){
   if(ns) ns.textContent=fo?`${fo.code} — ${fo.name.split(' ').slice(0,3).join(' ')}…`:(d.factory||'No factory');
 }
 function setF(id,k,v){ const d=designs.find(d=>d.id===id); if(d) d[k]=v; }
+function setNewModel(id,val){
+  const d=designs.find(d=>d.id===id); if(!d) return;
+  d['new-model']=val;
+  const trField=document.getElementById('tr-field-'+id);
+  const trBlock=document.getElementById('tr-block-'+id);
+  if(val==='Yes'){
+    if(trField) trField.style.display='';
+    // keep track-yes state
+    if(trBlock) trBlock.style.display=d['track-yes']?'':'none';
+  } else {
+    // hide both track radio and entries block, reset track-yes
+    if(trField) trField.style.display='none';
+    if(trBlock) trBlock.style.display='none';
+    d['track-yes']=false;
+    d['track-entries']=[];
+    // reset radios
+    const trN=document.querySelector(`input[name="tr-${id}"][value="n"]`);
+    if(trN) trN.checked=true;
+  }
+  updHeader(id);
+}
 function setTrack(id,yes){
   const d=designs.find(d=>d.id===id); if(!d) return;
   d['track-yes']=yes;
@@ -1487,7 +1508,7 @@ function buildPDFHTML(){
     <div class="D-right">
       <div class="D-cell">
         <span class="D-cell-t">Product Status</span>
-        <div class="D-fl"><span class="lk">New Model: </span><span class="lv">${isNew?'Yes':'No'}</span></div>
+        <div class="D-fl"><span class="lk">New Model in SBJ: </span><span class="lv">${isNew?'Yes':'No'}</span></div>
         <div class="D-fl"><span class="lk">Track Record: </span><span class="lv">${d['track-yes']?'Yes':'No'}</span></div>
         ${refsHTML}
       </div>
